@@ -1632,21 +1632,21 @@
             const inputs = document.querySelectorAll('.hrd-eval-input');
             const newQuestions = [];
             inputs.forEach(input => {
-                if (input.value.trim() !== '') newQuestions.push(input.value.trim());
+                if (input.value.trim() !== '') {
+                    newQuestions.push(input.value.trim());
+                }
             });
-
             saveHrdQuestions(newQuestions);
-            alert('Pertanyaan Evaluasi HRD berhasil diperbarui!');
             closeHrdEvalModal();
+            alert('Pertanyaan evaluasi HRD berhasil diperbarui!');
         }
 
-// --- UPLOAD MODULE & QUIZ CREATION (Lanjutan Kode Terpotong) ---
+        // --- UPLOAD MODULE & MANUAL QUIZ BUILDER ---
         function openUploadModal() {
             document.getElementById('uploadModal').classList.remove('hidden');
-            const container = document.getElementById('manualQuestionsContainer');
-            if (container.children.length === 0) {
-                addManualQuestionField(); // Otomatis menambahkan 1 field soal pertama saat modal dibuka
-            }
+            document.getElementById('uploadForm').reset();
+            document.getElementById('manualQuestionsContainer').innerHTML = '';
+            addManualQuestionField(); // Minimum 1 question field on open
         }
 
         function closeUploadModal() {
@@ -1655,25 +1655,27 @@
 
         function addManualQuestionField() {
             const container = document.getElementById('manualQuestionsContainer');
-            const qIndex = container.children.length;
+            const qCount = container.children.length;
 
-            const qBox = document.createElement('div');
-            qBox.className = "bg-slate-50 border border-indigo-100 p-3 rounded-lg text-xs space-y-2 relative";
-            qBox.innerHTML = `
-                <div class="flex justify-between items-center font-bold text-gray-700">
-                    <span>Soal Kuis ${qIndex + 1}</span>
-                    <button type="button" onclick="this.parentElement.parentElement.remove()" class="text-red-500 hover:text-red-700"><i class="fa-solid fa-trash"></i> Hapus</button>
+            const div = document.createElement('div');
+            div.className = "bg-slate-50 p-3 rounded-lg border border-slate-200 relative space-y-2 text-xs";
+            div.innerHTML = `
+                <div class="flex justify-between items-center">
+                    <span class="font-bold text-indigo-900">Pertanyaan ${qCount + 1}</span>
+                    ${qCount > 0 ? `<button type="button" onclick="this.parentElement.parentElement.remove()" class="text-red-500 hover:text-red-700"><i class="fa-solid fa-trash"></i></button>` : ''}
                 </div>
-                <input type="text" class="quiz-q-text w-full border p-1.5 rounded focus:ring-1 focus:ring-indigo-500" placeholder="Ketik pertanyaan kuis..." required>
+                <input type="text" required placeholder="Tulis soal kuis..." class="q-text-input w-full border border-gray-300 p-2 rounded text-xs focus:ring-1 focus:ring-indigo-500">
+                
                 <div class="grid grid-cols-2 gap-2">
-                    <input type="text" class="quiz-opt-0 w-full border p-1.5 rounded" placeholder="Pilihan A" required>
-                    <input type="text" class="quiz-opt-1 w-full border p-1.5 rounded" placeholder="Pilihan B" required>
-                    <input type="text" class="quiz-opt-2 w-full border p-1.5 rounded" placeholder="Pilihan C" required>
-                    <input type="text" class="quiz-opt-3 w-full border p-1.5 rounded" placeholder="Pilihan D" required>
+                    <input type="text" required placeholder="Pilihan A" class="q-opt-0 border border-gray-300 p-1.5 rounded text-xs">
+                    <input type="text" required placeholder="Pilihan B" class="q-opt-1 border border-gray-300 p-1.5 rounded text-xs">
+                    <input type="text" required placeholder="Pilihan C" class="q-opt-2 border border-gray-300 p-1.5 rounded text-xs">
+                    <input type="text" required placeholder="Pilihan D" class="q-opt-3 border border-gray-300 p-1.5 rounded text-xs">
                 </div>
-                <div class="flex items-center space-x-2">
-                    <label class="font-bold text-gray-600">Kunci Jawaban:</label>
-                    <select class="quiz-correct-ans border p-1 rounded font-bold text-emerald-700">
+
+                <div class="flex items-center space-x-2 pt-1">
+                    <label class="font-semibold text-gray-700">Kunci Jawaban Tepat:</label>
+                    <select class="q-correct-ans border border-gray-300 p-1 rounded bg-white text-xs font-bold text-indigo-700">
                         <option value="0">Pilihan A</option>
                         <option value="1">Pilihan B</option>
                         <option value="2">Pilihan C</option>
@@ -1681,12 +1683,12 @@
                     </select>
                 </div>
             `;
-            container.appendChild(qBox);
+            container.appendChild(div);
         }
 
         function handleFormSubmit(e) {
             e.preventDefault();
-            
+
             const dept = document.getElementById('formDept').value;
             const permission = document.getElementById('formPermission').value;
             const title = document.getElementById('formTitle').value.trim();
@@ -1698,73 +1700,60 @@
                 return;
             }
 
-            // Ekstrak Pertanyaan Kuis Manual
-            const qBoxes = document.querySelectorAll('#manualQuestionsContainer > div');
-            if (qBoxes.length === 0) {
-                alert('Trainer wajib menambahkan minimal 1 pertanyaan kuis!');
-                return;
-            }
-
+            // Extract questions
+            const questionBoxes = document.querySelectorAll('#manualQuestionsContainer > div');
             const generatedQuestions = [];
-            qBoxes.forEach(box => {
-                const qText = box.querySelector('.quiz-q-text').value.trim();
-                const opt0 = box.querySelector('.quiz-opt-0').value.trim();
-                const opt1 = box.querySelector('.quiz-opt-1').value.trim();
-                const opt2 = box.querySelector('.quiz-opt-2').value.trim();
-                const opt3 = box.querySelector('.quiz-opt-3').value.trim();
-                const correctAns = parseInt(box.querySelector('.quiz-correct-ans').value);
 
-                if (qText && opt0 && opt1 && opt2 && opt3) {
+            questionBoxes.forEach(box => {
+                const qText = box.querySelector('.q-text-input').value.trim();
+                const optA = box.querySelector('.q-opt-0').value.trim();
+                const optB = box.querySelector('.q-opt-1').value.trim();
+                const optC = box.querySelector('.q-opt-2').value.trim();
+                const optD = box.querySelector('.q-opt-3').value.trim();
+                const correctAns = parseInt(box.querySelector('.q-correct-ans').value);
+
+                if (qText && optA && optB && optC && optD) {
                     generatedQuestions.push({
                         question: qText,
-                        options: [opt0, opt1, opt2, opt3],
+                        options: [optA, optB, optC, optD],
                         answer: correctAns
                     });
                 }
             });
 
             if (generatedQuestions.length === 0) {
-                alert('Harap lengkapi semua pertanyaan dan pilihan jawaban kuis!');
+                alert('Silakan isi minimal 1 pertanyaan kuis beserta pilihan jawabannya!');
                 return;
             }
 
-            // Membaca File PDF Lokal sebagai DataURL
             const file = fileInput.files[0];
-            const reader = new FileReader();
+            const objectUrl = URL.createObjectURL(file);
 
-            reader.onload = function(evt) {
-                const pdfDataUrl = evt.target.result;
-
-                const newModule = {
-                    id: 'mod-' + Date.now(),
-                    dept: dept,
-                    title: title,
-                    type: 'PDF',
-                    permission: permission,
-                    slideUrl: pdfDataUrl,
-                    videoUrl: videoUrl,
-                    generatedQuestions: generatedQuestions
-                };
-
-                let customModules = JSON.parse(localStorage.getItem('solia_lms_custom_modules')) || [];
-                customModules.push(newModule);
-                localStorage.setItem('solia_lms_custom_modules', JSON.stringify(customModules));
-
-                alert('Modul pembelajaran & Kuis berhasil dipublikasikan!');
-                closeUploadModal();
-                document.getElementById('uploadForm').reset();
-                document.getElementById('manualQuestionsContainer').innerHTML = '';
-
-                if (activeDepartment === dept) {
-                    renderDepartmentDetail();
-                }
+            const newModule = {
+                id: 'mod-' + Date.now(),
+                dept: dept,
+                title: title,
+                type: 'PDF',
+                permission: permission,
+                slideUrl: objectUrl,
+                videoUrl: videoUrl,
+                generatedQuestions: generatedQuestions
             };
 
-            reader.readAsDataURL(file);
+            let customModules = JSON.parse(localStorage.getItem('solia_lms_custom_modules')) || [];
+            customModules.push(newModule);
+            localStorage.setItem('solia_lms_custom_modules', JSON.stringify(customModules));
+
+            closeUploadModal();
+            alert('Modul baru dan kuis berhasil dipublikasikan!');
+
+            if (activeDepartment === dept) {
+                renderDepartmentDetail();
+            }
         }
 
-        // --- INISIALISASI SAAT HALAMAN DIMUAT ---
-        document.addEventListener('DOMContentLoaded', () => {
+        // --- INITIALIZATION ---
+        window.addEventListener('DOMContentLoaded', () => {
             getUsersDB();
             updateAuthUI();
             updateDashboardStats();
