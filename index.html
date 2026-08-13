@@ -1646,7 +1646,7 @@
             document.getElementById('uploadModal').classList.remove('hidden');
             document.getElementById('uploadForm').reset();
             document.getElementById('manualQuestionsContainer').innerHTML = '';
-            addManualQuestionField(); // Minimum 1 question field on open
+            addManualQuestionField();
         }
 
         function closeUploadModal() {
@@ -1700,7 +1700,6 @@
                 return;
             }
 
-            // Extract questions
             const questionBoxes = document.querySelectorAll('#manualQuestionsContainer > div');
             const generatedQuestions = [];
 
@@ -1744,20 +1743,18 @@
             customModules.push(newModule);
             localStorage.setItem('solia_lms_custom_modules', JSON.stringify(customModules));
 
+            alert('Modul baru dan kuis berhasil di-publish!');
             closeUploadModal();
-            alert('Modul baru dan kuis berhasil dipublikasikan!');
-
             if (activeDepartment === dept) {
                 renderDepartmentDetail();
             }
         }
 
-        // --- INITIALIZATION ---
-        window.addEventListener('DOMContentLoaded', () => {
+        // --- INITIALIZE SYSTEM ON LOAD ---
+        window.onload = function() {
             getUsersDB();
-            updateAuthUI();
             updateDashboardStats();
-        });
+        };
     </script>
 </body>
 </html>
