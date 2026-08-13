@@ -4,1757 +4,1003 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Solia Legian Bali - LMS Portal</title>
-    <!-- Tailwind CSS CDN -->
     <script src="https://cdn.tailwindcss.com"></script>
-    <!-- FontAwesome Icons -->
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    <!-- PDF.js CDN -->
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
     <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/2.16.105/pdf.min.js"></script>
     <script>
         pdfjsLib.GlobalWorkerOptions.workerSrc = 'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/2.16.105/pdf.worker.min.js';
     </script>
+    <style>
+        .custom-scrollbar::-webkit-scrollbar { width: 6px; }
+        .custom-scrollbar::-webkit-scrollbar-track { background: #f1f5f9; }
+        .custom-scrollbar::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 4px; }
+        .custom-scrollbar::-webkit-scrollbar-thumb:hover { background: #94a3b8; }
+    </style>
 </head>
-<body class="bg-slate-100 font-sans text-gray-800">
+<body class="bg-slate-50 text-slate-800 font-sans antialiased min-h-screen flex flex-col">
 
-    <!-- TOP NAVIGATION BAR -->
-    <nav class="bg-indigo-900 text-white px-6 py-4 flex justify-between items-center shadow-md sticky top-0 z-40">
-        <div class="flex items-center space-x-3 cursor-pointer" onclick="switchMainTab('materi')">
-            <i class="fa-solid fa-hotel text-2xl text-amber-400"></i>
-            <div>
-                <h1 class="text-lg font-bold tracking-wide leading-tight">Solia Legian Bali Academy</h1>
-                <p class="text-[10px] text-indigo-200">Learning Management System</p>
-            </div>
-        </div>
-
-        <div class="flex items-center space-x-3">
-            <!-- HRD Evaluation Management Button -->
-            <button id="hrdEvalMgmtBtn" onclick="openHrdEvalModal()" class="hidden bg-emerald-600 hover:bg-emerald-700 text-white text-xs font-bold px-3 py-2 rounded-lg transition flex items-center shadow">
-                <i class="fa-solid fa-clipboard-list mr-1.5"></i> Kelola Evaluasi HRD
-            </button>
-
-            <!-- Super Admin User Management Button -->
-            <button id="adminUserMgmtBtn" onclick="openAdminUserModal()" class="hidden bg-purple-600 hover:bg-purple-700 text-white text-xs font-bold px-3 py-2 rounded-lg transition flex items-center shadow">
-                <i class="fa-solid fa-users-gear mr-1.5"></i> Kelola Akses Users
-            </button>
-
-            <!-- Upload Module Button -->
-            <button id="uploadMateriBtn" onclick="openUploadModal()" class="hidden bg-amber-500 hover:bg-amber-600 text-indigo-950 text-xs font-bold px-3 py-2 rounded-lg transition items-center shadow">
-                <i class="fa-solid fa-cloud-arrow-up mr-1.5"></i> Upload Materi
-            </button>
-
-            <!-- User Info Section -->
-            <div id="userInfoSection" class="hidden items-center bg-indigo-800 px-3 py-1.5 rounded-lg border border-indigo-700 text-xs space-x-3">
-                <div>
-                    <div id="userNameDisplay" class="font-bold text-white">Nama Staf</div>
-                    <div id="userRoleBadge" class="text-[10px] text-amber-300">Role: Staff</div>
+    <!-- LOGIN SCREEN -->
+    <div id="loginScreen" class="fixed inset-0 bg-slate-900 z-50 flex items-center justify-center p-4">
+        <div class="bg-white rounded-2xl shadow-2xl max-w-md w-full p-8 overflow-hidden relative">
+            <div class="absolute top-0 left-0 right-0 h-2 bg-gradient-to-r from-blue-600 to-indigo-700"></div>
+            
+            <div class="text-center mb-8">
+                <div class="inline-flex items-center justify-center w-16 h-16 rounded-full bg-blue-50 text-blue-700 text-2xl font-bold mb-4 border border-blue-200">
+                    <i class="fa-solid fa-hotel"></i>
                 </div>
-                <button onclick="handleLogout()" class="text-indigo-200 hover:text-white text-sm ml-2" title="Keluar / Logout">
-                    <i class="fa-solid fa-right-from-bracket"></i>
+                <h1 class="text-2xl font-bold text-slate-900">Solia Legian Bali</h1>
+                <p class="text-sm text-slate-500 mt-1">LMS & Staff Training Portal</p>
+            </div>
+
+            <!-- Login Step 1: Form -->
+            <div id="loginStep1" class="space-y-4">
+                <div>
+                    <label class="block text-xs font-semibold uppercase tracking-wider text-slate-600 mb-1">Nama Lengkap</label>
+                    <input type="text" id="loginName" class="w-full px-4 py-3 rounded-lg border border-slate-300 focus:outline-none focus:ring-2 focus:ring-blue-600 text-sm" placeholder="Contoh: Budi Santoso">
+                </div>
+                <div>
+                    <label class="block text-xs font-semibold uppercase tracking-wider text-slate-600 mb-1">Email Hotel (@solialegian.com)</label>
+                    <input type="email" id="loginEmail" class="w-full px-4 py-3 rounded-lg border border-slate-300 focus:outline-none focus:ring-2 focus:ring-blue-600 text-sm" placeholder="budi.santoso@solialegian.com">
+                </div>
+                <div>
+                    <label class="block text-xs font-semibold uppercase tracking-wider text-slate-600 mb-1">Departemen</label>
+                    <select id="loginDept" class="w-full px-4 py-3 rounded-lg border border-slate-300 focus:outline-none focus:ring-2 focus:ring-blue-600 text-sm bg-white">
+                        <option value="Front Office">Front Office</option>
+                        <option value="Housekeeping">Housekeeping</option>
+                        <option value="F&B Service">F&B Service</option>
+                        <option value="F&B Product (Kitchen)">F&B Product (Kitchen)</option>
+                        <option value="Engineering">Engineering</option>
+                        <option value="Security & Safety">Security & Safety</option>
+                        <option value="Sales & Marketing">Sales & Marketing</option>
+                        <option value="Human Resources">Human Resources</option>
+                        <option value="Accounting & Finance">Accounting & Finance</option>
+                    </select>
+                </div>
+                <button onclick="requestOTP()" class="w-full bg-blue-600 hover:bg-blue-700 text-white font-medium py-3 rounded-lg transition shadow-md text-sm mt-2">
+                    Kirim Kode OTP (Simulasi Gmail)
                 </button>
             </div>
 
-            <!-- Login / Register Buttons -->
-            <div id="authButtonsSection" class="flex space-x-2">
-                <button onclick="openAuthModal('login')" class="bg-indigo-700 hover:bg-indigo-600 text-white text-xs font-bold px-3 py-2 rounded-lg transition">Masuk</button>
-                <button onclick="openAuthModal('register')" class="bg-amber-500 hover:bg-amber-600 text-indigo-950 text-xs font-bold px-3 py-2 rounded-lg transition">Daftar Akun</button>
-            </div>
-        </div>
-    </nav>
-
-    <!-- MAIN DASHBOARD & NAVIGATION -->
-    <div class="max-w-7xl mx-auto p-6">
-        
-        <!-- TRAINING TARGET REMINDER -->
-        <div id="trainingReminderBox" class="mb-6 p-4 rounded-xl border bg-amber-50 border-amber-300 text-amber-900 flex items-start space-x-3 shadow-sm">
-            <i class="fa-solid fa-bell text-amber-600 text-xl mt-0.5"></i>
-            <div class="flex-1 text-xs">
-                <h4 class="font-bold text-sm text-amber-900">Peringatan Target Waktu Training Bulanan</h4>
-                <p id="reminderMessage" class="mt-0.5">Total jam training Anda bulan ini: <b id="displayReminderHours">0.0 Jam</b> (Kurang dari target minimal <b>10 Jam/bulan</b>). Silakan selesaikan modul pembelajaran yang tersisa.</p>
-            </div>
-        </div>
-
-        <!-- NAVIGATION TABS -->
-        <div class="flex border-b border-gray-300 mb-6 space-x-2 overflow-x-auto">
-            <button id="navMateriBtn" onclick="switchMainTab('materi')" class="py-3 px-5 border-b-2 border-indigo-600 font-bold text-indigo-600 text-sm whitespace-nowrap">
-                <i class="fa-solid fa-book-open-reader mr-1.5"></i> 1. Materi Training
-            </button>
-            <button id="navAttendanceBtn" onclick="switchMainTab('attendance')" class="py-3 px-5 border-b-2 border-transparent text-gray-500 hover:text-indigo-600 font-semibold text-sm whitespace-nowrap">
-                <i class="fa-solid fa-user-clock mr-1.5"></i> 2. Attendance Karyawan
-            </button>
-            <button id="navLogBtn" onclick="switchMainTab('log')" class="py-3 px-5 border-b-2 border-transparent text-gray-500 hover:text-indigo-600 font-semibold text-sm whitespace-nowrap">
-                <i class="fa-solid fa-file-invoice mr-1.5"></i> 3. Log Rekap Karyawan & Laporan
-            </button>
-        </div>
-
-        <!-- STATS CARDS -->
-        <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
-            <div class="bg-white p-6 rounded-xl shadow-sm border border-slate-200 flex items-center space-x-4">
-                <div class="p-3 bg-blue-100 text-blue-600 rounded-lg text-2xl"><i class="fa-solid fa-book-open"></i></div>
+            <!-- Login Step 2: OTP Verification -->
+            <div id="loginStep2" class="space-y-4 hidden">
+                <div class="bg-blue-50 border border-blue-200 rounded-lg p-4 text-xs text-blue-900 text-center">
+                    <i class="fa-solid fa-envelope-circle-check text-base mb-1 block"></i>
+                    Kode OTP simulasi telah dikirim ke Gmail Anda. <br>Masukkan kode <strong>6 angka</strong> di bawah ini.
+                    <div id="otpDisplayHelper" class="mt-2 font-mono font-bold text-blue-950 bg-blue-100 py-1 rounded"></div>
+                </div>
                 <div>
-                    <p class="text-gray-500 text-sm">Modul Selesai</p>
-                    <h3 id="statCompletedModules" class="text-2xl font-bold">0 Modul</h3>
+                    <label class="block text-xs font-semibold uppercase tracking-wider text-slate-600 mb-1">Kode OTP Verifikasi</label>
+                    <input type="text" id="loginOtpInput" maxlength="6" class="w-full text-center tracking-widest text-xl font-bold px-4 py-3 rounded-lg border border-slate-300 focus:outline-none focus:ring-2 focus:ring-blue-600" placeholder="------">
                 </div>
-            </div>
-            <div class="bg-white p-6 rounded-xl shadow-sm border border-slate-200 flex items-center space-x-4">
-                <div class="p-3 bg-indigo-100 text-indigo-600 rounded-lg text-2xl"><i class="fa-solid fa-clock"></i></div>
-                <div>
-                    <p class="text-gray-500 text-sm">Total Jam Belajar</p>
-                    <h3 id="statTotalHours" class="text-2xl font-bold text-amber-600">0.0 / 10 Jam</h3>
-                </div>
-            </div>
-            <div class="bg-white p-6 rounded-xl shadow-sm border border-slate-200 flex items-center space-x-4">
-                <div class="p-3 bg-green-100 text-green-600 rounded-lg text-2xl"><i class="fa-solid fa-award"></i></div>
-                <div>
-                    <p class="text-gray-500 text-sm">Sertifikat Diraih</p>
-                    <h3 id="statCertificates" class="text-2xl font-bold">0 Sertifikat</h3>
-                </div>
-            </div>
-        </div>
-
-        <!-- TAB CONTENT 1: MATERI TRAINING -->
-        <div id="sectionMateriTraining">
-            <div class="mb-6">
-                <h2 class="text-2xl font-bold text-gray-800">Materi Training Per Departemen</h2>
-                <p class="text-gray-600 text-sm">Pilih departemen di bawah ini untuk mempelajari modul, SOP, dan video tutorial.</p>
-            </div>
-
-            <!-- DEPARTMENT CARDS GRID -->
-            <div id="dashboardView">
-                <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-                    <div onclick="openDepartmentView('Front Office')" class="bg-white rounded-xl shadow-sm border border-slate-200 overflow-hidden hover:shadow-lg transition cursor-pointer group">
-                        <div class="bg-indigo-600 p-4 text-white flex justify-between items-center group-hover:bg-indigo-700">
-                            <h3 class="font-bold text-lg">Front Office (FO)</h3>
-                            <i class="fa-solid fa-concierge-bell text-2xl opacity-80"></i>
-                        </div>
-                        <div class="p-5 flex justify-between items-center">
-                            <p class="text-gray-600 text-sm">SOP Check-in/out, Reservation, complaints, dll.</p>
-                            <i class="fa-solid fa-chevron-right text-indigo-600 group-hover:translate-x-1 transition"></i>
-                        </div>
-                    </div>
-
-                    <div onclick="openDepartmentView('Housekeeping')" class="bg-white rounded-xl shadow-sm border border-slate-200 overflow-hidden hover:shadow-lg transition cursor-pointer group">
-                        <div class="bg-emerald-600 p-4 text-white flex justify-between items-center group-hover:bg-emerald-700">
-                            <h3 class="font-bold text-lg">Housekeeping (HK)</h3>
-                            <i class="fa-solid fa-broom text-2xl opacity-80"></i>
-                        </div>
-                        <div class="p-5 flex justify-between items-center">
-                            <p class="text-gray-600 text-sm">Standar Kebersihan Kamar, Public Area, Chemical.</p>
-                            <i class="fa-solid fa-chevron-right text-emerald-600 group-hover:translate-x-1 transition"></i>
-                        </div>
-                    </div>
-
-                    <div onclick="openDepartmentView('F&B Service')" class="bg-white rounded-xl shadow-sm border border-slate-200 overflow-hidden hover:shadow-lg transition cursor-pointer group">
-                        <div class="bg-amber-600 p-4 text-white flex justify-between items-center group-hover:bg-amber-700">
-                            <h3 class="font-bold text-lg">F&B Service</h3>
-                            <i class="fa-solid fa-utensils text-2xl opacity-80"></i>
-                        </div>
-                        <div class="p-5 flex justify-between items-center">
-                            <p class="text-gray-600 text-sm">Table Manners, Order Taking, Upselling & Banquet.</p>
-                            <i class="fa-solid fa-chevron-right text-amber-600 group-hover:translate-x-1 transition"></i>
-                        </div>
-                    </div>
-
-                    <div onclick="openDepartmentView('F&B Product')" class="bg-white rounded-xl shadow-sm border border-slate-200 overflow-hidden hover:shadow-lg transition cursor-pointer group">
-                        <div class="bg-red-600 p-4 text-white flex justify-between items-center group-hover:bg-red-700">
-                            <h3 class="font-bold text-lg">F&B Product (Kitchen)</h3>
-                            <i class="fa-solid fa-kitchen-set text-2xl opacity-80"></i>
-                        </div>
-                        <div class="p-5 flex justify-between items-center">
-                            <p class="text-gray-600 text-sm">Food Safety, Hygiene, Standar Resep, Operasional Dapur.</p>
-                            <i class="fa-solid fa-chevron-right text-red-600 group-hover:translate-x-1 transition"></i>
-                        </div>
-                    </div>
-
-                    <div onclick="openDepartmentView('Engineering')" class="bg-white rounded-xl shadow-sm border border-slate-200 overflow-hidden hover:shadow-lg transition cursor-pointer group">
-                        <div class="bg-cyan-600 p-4 text-white flex justify-between items-center group-hover:bg-cyan-700">
-                            <h3 class="font-bold text-lg">Engineering</h3>
-                            <i class="fa-solid fa-wrench text-2xl opacity-80"></i>
-                        </div>
-                        <div class="p-5 flex justify-between items-center">
-                            <p class="text-gray-600 text-sm">Perawatan AC/HVAC, Listrik, Plumbing, Maintenance.</p>
-                            <i class="fa-solid fa-chevron-right text-cyan-600 group-hover:translate-x-1 transition"></i>
-                        </div>
-                    </div>
-
-                    <div onclick="openDepartmentView('Security & Safety')" class="bg-white rounded-xl shadow-sm border border-slate-200 overflow-hidden hover:shadow-lg transition cursor-pointer group">
-                        <div class="bg-slate-700 p-4 text-white flex justify-between items-center group-hover:bg-slate-800">
-                            <h3 class="font-bold text-lg">Security & Safety</h3>
-                            <i class="fa-solid fa-shield-halved text-2xl opacity-80"></i>
-                        </div>
-                        <div class="p-5 flex justify-between items-center">
-                            <p class="text-gray-600 text-sm">Prosedur Evakuasi, Penanganan APAR, Pertolongan Pertama.</p>
-                            <i class="fa-solid fa-chevron-right text-slate-700 group-hover:translate-x-1 transition"></i>
-                        </div>
-                    </div>
-
-                    <div onclick="openDepartmentView('Sales & Marketing')" class="bg-white rounded-xl shadow-sm border border-slate-200 overflow-hidden hover:shadow-lg transition cursor-pointer group">
-                        <div class="bg-purple-600 p-4 text-white flex justify-between items-center group-hover:bg-purple-700">
-                            <h3 class="font-bold text-lg">Sales & Marketing</h3>
-                            <i class="fa-solid fa-chart-line text-2xl opacity-80"></i>
-                        </div>
-                        <div class="p-5 flex justify-between items-center">
-                            <p class="text-gray-600 text-sm">Revenue Management, Event Sales, Digital Marketing.</p>
-                            <i class="fa-solid fa-chevron-right text-purple-600 group-hover:translate-x-1 transition"></i>
-                        </div>
-                    </div>
-
-                    <div onclick="openDepartmentView('Human Resources')" class="bg-white rounded-xl shadow-sm border border-slate-200 overflow-hidden hover:shadow-lg transition cursor-pointer group">
-                        <div class="bg-pink-600 p-4 text-white flex justify-between items-center group-hover:bg-pink-700">
-                            <h3 class="font-bold text-lg">Human Resources</h3>
-                            <i class="fa-solid fa-users text-2xl opacity-80"></i>
-                        </div>
-                        <div class="p-5 flex justify-between items-center">
-                            <p class="text-gray-600 text-sm">Company Orientation, Employee Rights, Code of Conduct.</p>
-                            <i class="fa-solid fa-chevron-right text-pink-600 group-hover:translate-x-1 transition"></i>
-                        </div>
-                    </div>
-
-                    <div onclick="openDepartmentView('Accounting & Finance')" class="bg-white rounded-xl shadow-sm border border-slate-200 overflow-hidden hover:shadow-lg transition cursor-pointer group">
-                        <div class="bg-teal-600 p-4 text-white flex justify-between items-center group-hover:bg-teal-700">
-                            <h3 class="font-bold text-lg">Accounting & Finance</h3>
-                            <i class="fa-solid fa-calculator text-2xl opacity-80"></i>
-                        </div>
-                        <div class="p-5 flex justify-between items-center">
-                            <p class="text-gray-600 text-sm">Night Audit, Cashiering, Purchasing, Cost Control, IT.</p>
-                            <i class="fa-solid fa-chevron-right text-teal-600 group-hover:translate-x-1 transition"></i>
-                        </div>
-                    </div>
-                </div>
-            </div>
-
-            <!-- DEPARTMENT DETAIL VIEW -->
-            <div id="departmentDetailView" class="hidden">
-                <button onclick="showDashboardView()" class="mb-4 text-indigo-600 hover:text-indigo-800 font-semibold text-sm flex items-center transition">
-                    <i class="fa-solid fa-arrow-left mr-2"></i> Kembali ke Daftar Departemen
+                <button onclick="verifyOTP()" class="w-full bg-blue-600 hover:bg-blue-700 text-white font-medium py-3 rounded-lg transition shadow-md text-sm">
+                    Verifikasi & Masuk Portal
                 </button>
+                <button onclick="backToLoginStep1()" class="w-full text-slate-500 hover:text-slate-700 text-xs text-center pt-2">
+                    <i class="fa-solid fa-arrow-left mr-1"></i> Kembali ke Form Utama
+                </button>
+            </div>
+        </div>
+    </div>
 
-                <div class="bg-white p-6 rounded-xl shadow-sm border border-slate-200 mb-6 flex justify-between items-center">
+    <!-- MAIN APP WRAPPER -->
+    <div id="mainApp" class="flex-1 flex flex-col hidden">
+        <!-- TOP NAVIGATION -->
+        <header class="bg-white border-b border-slate-200 sticky top-0 z-30 shadow-xs">
+            <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-16 flex items-center justify-between">
+                <div class="flex items-center space-x-3">
+                    <div class="w-10 h-10 rounded-lg bg-blue-600 text-white flex items-center justify-center font-bold text-lg shadow-sm">
+                        <i class="fa-solid fa-hotel"></i>
+                    </div>
                     <div>
-                        <span class="text-xs font-semibold text-indigo-600 uppercase tracking-wider bg-indigo-50 px-2 py-1 rounded">Modul Materi</span>
-                        <h2 id="deptDetailTitle" class="text-2xl font-bold text-gray-800 mt-1">Nama Departemen</h2>
-                        <p id="deptDetailDesc" class="text-gray-500 text-sm mt-1">Daftar modul pembelajaran, video, PDF, dan SOP yang dapat Anda akses.</p>
-                    </div>
-                    <div id="deptDetailIcon" class="text-4xl text-indigo-600 p-4 bg-indigo-50 rounded-xl hidden md:block">
-                        <i class="fa-solid fa-building"></i>
+                        <span class="font-bold text-slate-900 text-base tracking-tight block">Solia Legian Bali</span>
+                        <span class="text-xs text-blue-700 font-medium">LMS & Training Academy</span>
                     </div>
                 </div>
 
-                <div class="flex border-b border-gray-200 mb-6 overflow-x-auto">
-                    <button id="tabFilterAll" onclick="filterModuleType('ALL')" class="py-3 px-5 border-b-2 border-indigo-600 font-bold text-indigo-600 text-sm whitespace-nowrap">
-                        <i class="fa-solid fa-layer-group mr-1.5"></i> Semua Modul
+                <!-- Nav Menu Links -->
+                <nav class="hidden md:flex space-x-1">
+                    <button onclick="switchTab('attendance')" id="nav-attendance" class="nav-btn px-4 py-2 rounded-lg text-sm font-medium transition text-blue-700 bg-blue-50">
+                        <i class="fa-solid fa-clock-rotate-left mr-2"></i> Attendance
                     </button>
-                    <button id="tabFilterSop" onclick="filterModuleType('SOP')" class="py-3 px-5 border-b-2 border-transparent text-gray-500 hover:text-indigo-600 font-semibold text-sm whitespace-nowrap">
-                        <i class="fa-solid fa-file-contract mr-1.5"></i> SOP Utama
+                    <button onclick="switchTab('training')" id="nav-training" class="nav-btn px-4 py-2 rounded-lg text-sm font-medium transition text-slate-600 hover:bg-slate-100">
+                        <i class="fa-solid fa-graduation-cap mr-2"></i> Training Material
                     </button>
-                    <button id="tabFilterVideo" onclick="filterModuleType('VIDEO')" class="py-3 px-5 border-b-2 border-transparent text-gray-500 hover:text-indigo-600 font-semibold text-sm whitespace-nowrap">
-                        <i class="fa-solid fa-circle-play mr-1.5"></i> Modul Video
+                    <button onclick="switchTab('rekap')" id="nav-rekap" class="nav-btn px-4 py-2 rounded-lg text-sm font-medium transition text-slate-600 hover:bg-slate-100">
+                        <i class="fa-solid fa-chart-line mr-2"></i> Rekap & Evaluasi
                     </button>
-                    <button id="tabFilterPdf" onclick="filterModuleType('PDF')" class="py-3 px-5 border-b-2 border-transparent text-gray-500 hover:text-indigo-600 font-semibold text-sm whitespace-nowrap">
-                        <i class="fa-solid fa-file-pdf mr-1.5"></i> Dokumen PDF / Presentasi
+                    <button onclick="switchTab('admin')" id="nav-admin" class="nav-btn px-4 py-2 rounded-lg text-sm font-medium transition text-slate-600 hover:bg-slate-100 hidden">
+                        <i class="fa-solid fa-user-gear mr-2"></i> Super Admin
                     </button>
-                </div>
+                </nav>
 
-                <div id="modulesContainer" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6"></div>
-
-                <div id="emptyModulesState" class="hidden text-center py-12 bg-white rounded-xl border border-dashed border-gray-300">
-                    <i class="fa-solid fa-folder-open text-4xl text-gray-300 mb-3"></i>
-                    <h3 class="text-gray-600 font-bold text-base">Tidak Ada Modul Ditemukan</h3>
-                    <p class="text-gray-400 text-xs mt-1">Belum ada modul yang diunggah di kategori ini.</p>
+                <!-- User Profile Dropdown / Info -->
+                <div class="flex items-center space-x-3">
+                    <div class="text-right hidden sm:block">
+                        <div id="headerUserName" class="text-xs font-bold text-slate-800">Nama Staff</div>
+                        <div id="headerUserRole" class="text-[10px] text-blue-700 font-semibold uppercase">Role</div>
+                    </div>
+                    <div onclick="logout()" title="Keluar" class="w-9 h-9 rounded-full bg-slate-200 text-slate-700 flex items-center justify-center cursor-pointer hover:bg-rose-100 hover:text-rose-600 transition">
+                        <i class="fa-solid fa-power-off text-sm"></i>
+                    </div>
                 </div>
             </div>
-        </div>
+        </header>
 
-        <!-- TAB CONTENT 2: ATTENDANCE KARYAWAN -->
-        <div id="sectionAttendance" class="hidden">
-            <div class="bg-white p-6 rounded-xl shadow-sm border border-slate-200 mb-6">
-                <h2 class="text-xl font-bold text-gray-800 mb-2"><i class="fa-solid fa-user-clock text-indigo-600 mr-2"></i>Presensi / Attendance Sesi Training</h2>
-                <p class="text-xs text-gray-500 mb-6">Lakukan Clock In saat memulai sesi pembelajaran dan Clock Out setelah selesai untuk mencatat jam pelatihan Anda secara otomatis.</p>
+        <!-- CONTENT CONTAINER -->
+        <main class="flex-1 max-w-7xl w-full mx-auto px-4 sm:px-6 lg:px-8 py-6">
 
-                <div class="grid grid-cols-1 md:grid-cols-2 gap-6 bg-slate-50 p-6 rounded-xl border border-slate-200">
-                    <div class="space-y-4">
+            <!-- TAB 1: ATTENDANCE -->
+            <section id="tab-attendance" class="tab-content space-y-6">
+                <div class="bg-white rounded-xl shadow-xs border border-slate-200 p-6">
+                    <div class="flex flex-col md:flex-row md:items-center justify-between gap-4 border-b border-slate-100 pb-4 mb-6">
                         <div>
-                            <label class="block text-xs font-semibold text-gray-700 mb-1">Status Kehadiran Hari Ini:</label>
-                            <span id="attendanceStatusBadge" class="inline-block px-3 py-1 bg-gray-200 text-gray-700 rounded-full text-xs font-bold">Belum Presensi</span>
+                            <h2 class="text-lg font-bold text-slate-900"><i class="fa-solid fa-fingerprint text-blue-600 mr-2"></i>Absensi & Kehadiran Sesi Training</h2>
+                            <p class="text-xs text-slate-500 mt-0.5">Lakukan Clock In sebelum memulai pelatihan modul departemen.</p>
                         </div>
-                        <div>
-                            <label class="block text-xs font-semibold text-gray-700 mb-1">Jam Masuk (Clock In):</label>
-                            <div id="clockInTimeDisplay" class="text-sm font-mono font-bold text-gray-600">-- : -- : --</div>
-                        </div>
-                        <div>
-                            <label class="block text-xs font-semibold text-gray-700 mb-1">Jam Keluar (Clock Out):</label>
-                            <div id="clockOutTimeDisplay" class="text-sm font-mono font-bold text-gray-600">-- : -- : --</div>
+                        <div id="attendanceStatusBadge" class="inline-flex items-center px-3 py-1 rounded-full text-xs font-semibold bg-slate-100 text-slate-600">
+                            <i class="fa-solid fa-circle text-[8px] mr-2 text-slate-400"></i> Belum Clock In Hari Ini
                         </div>
                     </div>
 
-                    <div class="flex flex-col justify-center space-y-3">
-                        <button onclick="handleClockIn()" class="w-full bg-emerald-600 hover:bg-emerald-700 text-white font-bold py-3 rounded-lg text-sm transition flex items-center justify-center shadow">
-                            <i class="fa-solid fa-right-to-bracket mr-2"></i> Clock In Sesi Training
+                    <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+                        <!-- Clock In Control Box -->
+                        <div class="bg-slate-50 rounded-xl p-5 border border-slate-200 flex flex-col justify-between">
+                            <div>
+                                <span class="text-xs font-semibold text-slate-400 uppercase tracking-wider">Waktu Lokal Bali (WITA)</span>
+                                <div id="liveClock" class="text-2xl font-mono font-bold text-slate-800 mt-1">00:00:00</div>
+                                <div id="liveDate" class="text-xs text-slate-500 mt-0.5">Kamis, 13 Agustus 2026</div>
+                            </div>
+                            <div class="mt-6 space-y-3">
+                                <button onclick="handleClockIn()" id="btnClockIn" class="w-full bg-emerald-600 hover:bg-emerald-700 text-white font-medium py-2.5 rounded-lg text-sm shadow-sm transition">
+                                    <i class="fa-solid fa-right-to-bracket mr-2"></i> Clock In Sekarang
+                                </button>
+                                <button onclick="handleClockOut()" id="btnClockOut" class="w-full bg-rose-600 hover:bg-rose-700 text-white font-medium py-2.5 rounded-lg text-sm shadow-sm transition hidden">
+                                    <i class="fa-solid fa-right-from-bracket mr-2"></i> Clock Out Sesi
+                                </button>
+                            </div>
+                        </div>
+
+                        <!-- Info & Guidelines -->
+                        <div class="md:col-span-2 bg-blue-50/50 rounded-xl p-5 border border-blue-200 text-xs text-slate-700 space-y-3">
+                            <h3 class="font-bold text-blue-900 text-sm flex items-center">
+                                <i class="fa-solid fa-circle-info mr-2"></i> Ketentuan Absensi Training Solia Legian
+                            </h3>
+                            <ul class="list-disc list-inside space-y-1.5 text-slate-600">
+                                <li>Setiap staff wajib melakukan <strong>Clock In</strong> sebelum membuka materi training atau modul SOP.</li>
+                                <li>Target akumulasi waktu belajar minimal adalah <strong>10 Jam per Bulan</strong> sesuai SOP HRD Solia Legian Bali.</li>
+                                <li>Sistem mencatat durasi aktif saat Anda membaca file PDF atau menonton video tutorial modul.</li>
+                                <li>Pastikan melakukan <strong>Clock Out</strong> setelah selesai sesi belajar harian Anda.</li>
+                            </ul>
+                        </div>
+                    </div>
+
+                    <!-- Attendance Log Table -->
+                    <div class="mt-8">
+                        <h3 class="text-sm font-bold text-slate-800 mb-3"><i class="fa-solid fa-table-list text-blue-600 mr-2"></i>Riwayat Absensi Kehadiran</h3>
+                        <div class="overflow-x-auto rounded-lg border border-slate-200">
+                            <table class="w-full text-left border-collapse text-xs">
+                                <thead>
+                                    <tr class="bg-slate-100 text-slate-600 uppercase font-semibold">
+                                        <th class="p-3">Tanggal</th>
+                                        <th class="p-3">Jam Masuk</th>
+                                        <th class="p-3">Jam Pulang</th>
+                                        <th class="p-3">Total Durasi</th>
+                                        <th class="p-3">Status</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="attendanceTableBody" class="divide-y divide-slate-200">
+                                    <tr>
+                                        <td colspan="5" class="p-4 text-center text-slate-400">Belum ada riwayat absensi tercatat.</td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- TAB 2: TRAINING MATERIAL -->
+            <section id="tab-training" class="tab-content space-y-6 hidden">
+                <div class="bg-white rounded-xl shadow-xs border border-slate-200 p-6">
+                    <div class="flex flex-col md:flex-row md:items-center justify-between gap-4 border-b border-slate-100 pb-4 mb-6">
+                        <div>
+                            <h2 class="text-lg font-bold text-slate-900"><i class="fa-solid fa-book-open text-blue-600 mr-2"></i>Pusat Materi Training Departemen</h2>
+                            <p class="text-xs text-slate-500 mt-0.5">Pilih departemen dan modul pembelajaran standar operasional Solia Legian Bali.</p>
+                        </div>
+                        <div class="flex items-center space-x-2">
+                            <span class="text-xs font-semibold text-slate-500">Filter Tipe:</span>
+                            <select id="filterType" onchange="renderModules()" class="px-3 py-1.5 rounded-lg border border-slate-300 text-xs bg-white focus:outline-none focus:ring-1 focus:ring-blue-600">
+                                <option value="all">Semua Tipe</option>
+                                <option value="SOP">SOP Dokumen</option>
+                                <option value="Video">Video Tutorial</option>
+                                <option value="PDF">PDF / Presentasi</option>
+                            </select>
+                        </div>
+                    </div>
+
+                    <!-- Department Tabs Scrollable -->
+                    <div class="flex space-x-2 overflow-x-auto pb-2 custom-scrollbar" id="deptTabsContainer"></div>
+                </div>
+
+                <!-- Module Cards Grid -->
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-6" id="moduleCardsContainer"></div>
+            </section>
+
+            <!-- TAB 3: REKAP & EVALUASI -->
+            <section id="tab-rekap" class="tab-content space-y-6 hidden">
+                <div class="grid grid-cols-1 md:grid-cols-4 gap-4">
+                    <div class="bg-white p-5 rounded-xl border border-slate-200 shadow-xs flex items-center space-x-4">
+                        <div class="w-12 h-12 rounded-lg bg-blue-50 text-blue-600 flex items-center justify-center text-xl font-bold">
+                            <i class="fa-solid fa-clock"></i>
+                        </div>
+                        <div>
+                            <div class="text-xs text-slate-400 font-semibold uppercase">Total Belajar Bulan Ini</div>
+                            <div id="statTotalHours" class="text-lg font-bold text-slate-800">0 Jam 0 Min</div>
+                            <div class="text-[10px] text-blue-600 font-medium">Target: 10 Jam / Bulan</div>
+                        </div>
+                    </div>
+                    <div class="bg-white p-5 rounded-xl border border-slate-200 shadow-xs flex items-center space-x-4">
+                        <div class="w-12 h-12 rounded-lg bg-emerald-50 text-emerald-600 flex items-center justify-center text-xl font-bold">
+                            <i class="fa-solid fa-circle-check"></i>
+                        </div>
+                        <div>
+                            <div class="text-xs text-slate-400 font-semibold uppercase">Modul Selesai (Lulus)</div>
+                            <div id="statCompletedModules" class="text-lg font-bold text-slate-800">0 Modul</div>
+                            <div class="text-[10px] text-emerald-600 font-medium">Skor Kuis >= 70</div>
+                        </div>
+                    </div>
+                    <div class="bg-white p-5 rounded-xl border border-slate-200 shadow-xs flex items-center space-x-4">
+                        <div class="w-12 h-12 rounded-lg bg-sky-50 text-sky-600 flex items-center justify-center text-xl font-bold">
+                            <i class="fa-solid fa-percent"></i>
+                        </div>
+                        <div>
+                            <div class="text-xs text-slate-400 font-semibold uppercase">Persentase Target</div>
+                            <div id="statPercentage" class="text-lg font-bold text-slate-800">0%</div>
+                            <div class="text-[10px] text-sky-600 font-medium">Progress Bulanan</div>
+                        </div>
+                    </div>
+                    <div class="bg-white p-5 rounded-xl border border-slate-200 shadow-xs flex items-center space-x-4">
+                        <div class="w-12 h-12 rounded-lg bg-indigo-50 text-indigo-600 flex items-center justify-center text-xl font-bold">
+                            <i class="fa-solid fa-award"></i>
+                        </div>
+                        <div>
+                            <div class="text-xs text-slate-400 font-semibold uppercase">Status Kinerja</div>
+                            <div id="statBadgeStatus" class="text-sm font-bold text-indigo-700">Aktif Berproses</div>
+                            <div class="text-[10px] text-indigo-500 font-medium">Staff Solia Legian</div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Detailed Rekap Table -->
+                <div class="bg-white rounded-xl shadow-xs border border-slate-200 p-6">
+                    <h3 class="text-base font-bold text-slate-900 mb-4"><i class="fa-solid fa-file-invoice text-blue-600 mr-2"></i>Rekapitulasi Aktivitas & Kuis Pelatihan Staff</h3>
+                    <div class="overflow-x-auto rounded-lg border border-slate-200">
+                        <table class="w-full text-left border-collapse text-xs">
+                            <thead>
+                                <tr class="bg-slate-100 text-slate-600 uppercase font-semibold">
+                                    <th class="p-3">Judul Modul</th>
+                                    <th class="p-3">Departemen</th>
+                                    <th class="p-3">Waktu Akses</th>
+                                    <th class="p-3">Durasi</th>
+                                    <th class="p-3">Skor Kuis</th>
+                                    <th class="p-3">Status</th>
+                                </tr>
+                            </thead>
+                            <tbody id="rekapTableBody" class="divide-y divide-slate-200">
+                                <tr>
+                                    <td colspan="6" class="p-4 text-center text-slate-400">Belum ada aktivitas training tercatat. Silakan pelajari modul di tab Training.</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </section>
+
+            <!-- TAB 4: SUPER ADMIN -->
+            <section id="tab-admin" class="tab-content space-y-6 hidden">
+                <div class="bg-white rounded-xl shadow-xs border border-slate-200 p-6">
+                    <div class="flex items-center justify-between border-b border-slate-100 pb-4 mb-6">
+                        <div>
+                            <h2 class="text-lg font-bold text-slate-900"><i class="fa-solid fa-user-gear text-blue-600 mr-2"></i>Panel Super Admin & Manajemen HRD</h2>
+                            <p class="text-xs text-slate-500 mt-0.5">Kelola akses staff, ubah role, department, dan atur template kuis evaluasi hotel.</p>
+                        </div>
+                        <button onclick="openAddUserModal()" class="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg text-xs font-medium transition shadow-xs">
+                            <i class="fa-solid fa-user-plus mr-1"></i> Tambah Staff Baru
                         </button>
-                        <button onclick="handleClockOut()" class="w-full bg-red-600 hover:bg-red-700 text-white font-bold py-3 rounded-lg text-sm transition flex items-center justify-center shadow">
-                            <i class="fa-solid fa-right-from-bracket mr-2"></i> Clock Out Sesi Training
-                        </button>
                     </div>
-                </div>
-            </div>
-        </div>
 
-        <!-- TAB CONTENT 3: LOG REKAP KARYAWAN & LAPORAN BULANAN -->
-        <div id="sectionLogRekap" class="hidden">
-            <div class="bg-white p-6 rounded-xl shadow-sm border border-slate-200 mb-6">
-                <div class="flex justify-between items-center mb-4">
-                    <div>
-                        <h2 class="text-xl font-bold text-gray-800"><i class="fa-solid fa-file-invoice text-indigo-600 mr-2"></i>Log Rekap Aktivitas & Laporan Bulanan</h2>
-                        <p class="text-xs text-gray-500 mt-0.5">Merekam data jam belajar otomatis, modul yang dikerjakan, dan riwayat pelatihan.</p>
+                    <!-- Staff Accounts Table -->
+                    <h3 class="text-sm font-bold text-slate-800 mb-3">Daftar Akun Staff Terdaftar</h3>
+                    <div class="overflow-x-auto rounded-lg border border-slate-200 mb-8">
+                        <table class="w-full text-left border-collapse text-xs">
+                            <thead>
+                                <tr class="bg-slate-100 text-slate-600 uppercase font-semibold">
+                                    <th class="p-3">Nama Staff</th>
+                                    <th class="p-3">Email</th>
+                                    <th class="p-3">Departemen</th>
+                                    <th class="p-3">Role Akses</th>
+                                    <th class="p-3 text-right">Aksi Manajemen</th>
+                                </tr>
+                            </thead>
+                            <tbody id="adminUserTableBody" class="divide-y divide-slate-200"></tbody>
+                        </table>
                     </div>
-                    <button onclick="exportMonthlyReport()" class="bg-indigo-600 hover:bg-indigo-700 text-white text-xs font-bold px-3 py-2 rounded-lg transition">
-                        <i class="fa-solid fa-download mr-1.5"></i> Unduh Laporan Bulanan
-                    </button>
-                </div>
 
-                <div class="overflow-x-auto">
-                    <table class="w-full text-xs text-left border-collapse">
-                        <thead>
-                            <tr class="bg-slate-100 text-slate-700 border-b">
-                                <th class="p-3">Tanggal & Waktu</th>
-                                <th class="p-3">Nama Karyawan</th>
-                                <th class="p-3">Departemen</th>
-                                <th class="p-3">Aktivitas Modul</th>
-                                <th class="p-3">Durasi Belajar</th>
-                                <th class="p-3">Status / Nilai</th>
-                            </tr>
-                        </thead>
-                        <tbody id="logTableBody" class="divide-y divide-slate-100"></tbody>
-                    </table>
-                </div>
-            </div>
-        </div>
-
-    </div>
-
-    <!-- MODAL AUTHENTICATION -->
-    <div id="authModal" class="fixed inset-0 bg-black bg-opacity-60 hidden flex items-center justify-center p-4 z-50">
-        <div class="bg-white rounded-xl max-w-md w-full p-6 shadow-2xl relative">
-            <button onclick="closeAuthModal()" class="absolute top-4 right-4 text-gray-400 hover:text-gray-600 text-xl">
-                <i class="fa-solid fa-xmark"></i>
-            </button>
-
-            <div id="authFormsContainer">
-                <div class="flex border-b mb-4">
-                    <button id="tabLoginBtn" onclick="switchAuthTab('login')" class="flex-1 py-2 font-bold text-sm border-b-2 border-indigo-600 text-indigo-600">Masuk</button>
-                    <button id="tabRegisterBtn" onclick="switchAuthTab('register')" class="flex-1 py-2 font-bold text-sm border-b-2 border-transparent text-gray-400">Registrasi Staf</button>
-                </div>
-
-                <form id="loginForm" onsubmit="handleLoginSubmit(event)" class="space-y-4">
-                    <div>
-                        <label class="block text-xs font-semibold text-gray-700 mb-1">Email Staf / Admin:</label>
-                        <input type="email" id="loginEmail" required placeholder="nama@solialegian.com" class="w-full border p-2 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500">
-                    </div>
-                    <div>
-                        <label class="block text-xs font-semibold text-gray-700 mb-1">Kata Sandi:</label>
-                        <div class="relative">
-                            <input type="password" id="loginPassword" required placeholder="••••••••" class="w-full border p-2 pr-10 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500">
-                            <button type="button" onclick="togglePasswordVisibility('loginPassword', 'loginEyeIcon')" class="absolute inset-y-0 right-0 pr-3 flex items-center text-gray-400 hover:text-indigo-600">
-                                <i id="loginEyeIcon" class="fa-solid fa-eye"></i>
-                            </button>
+                    <!-- HRD Quiz Question Template Editor Section -->
+                    <div class="border-t border-slate-100 pt-6">
+                        <div class="flex items-center justify-between mb-3">
+                            <h3 class="text-sm font-bold text-slate-800"><i class="fa-solid fa-list-check text-blue-600 mr-2"></i>Pengaturan Bank Soal & Evaluasi HRD</h3>
+                            <span class="text-xs text-slate-500">Pilih modul untuk mengedit pertanyaan kuis</span>
                         </div>
+                        <select id="adminModuleSelect" onchange="renderAdminQuizEditor()" class="w-full md:w-1/3 px-3 py-2 rounded-lg border border-slate-300 text-xs bg-white mb-4 focus:outline-none focus:ring-1 focus:ring-blue-600"></select>
+                        <div id="adminQuizEditorContainer" class="space-y-4 bg-slate-50 p-4 rounded-xl border border-slate-200"></div>
                     </div>
-                    <button type="submit" class="w-full bg-indigo-600 hover:bg-indigo-700 text-white font-bold py-2.5 rounded-lg text-sm transition">Masuk ke Akun</button>
-                    <p class="text-[11px] text-slate-500 text-center">Akun Super Admin: <b>itm@solialegian.com</b> / Pass: <b>@dmin16S0l</b></p>
-                </form>
+                </div>
+            </section>
 
-                <form id="registerForm" onsubmit="handleRegisterSubmit(event)" class="space-y-3 hidden">
-                    <div>
-                        <label class="block text-xs font-semibold text-gray-700 mb-1">Nama Lengkap Staf:</label>
-                        <input type="text" id="regName" required placeholder="Contoh: Budi Santoso" class="w-full border p-2 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500">
-                    </div>
-                    <div>
-                        <label class="block text-xs font-semibold text-gray-700 mb-1">Email Gmail Valid:</label>
-                        <input type="email" id="regEmail" required placeholder="contoh@gmail.com" class="w-full border p-2 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500">
-                    </div>
-                    <div>
-                        <label class="block text-xs font-semibold text-gray-700 mb-1">Pilih Departemen:</label>
-                        <select id="regDept" required class="w-full border p-2 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500">
-                            <option value="Front Office">Front Office</option>
-                            <option value="Housekeeping">Housekeeping</option>
-                            <option value="F&B Service">F&B Service</option>
-                            <option value="F&B Product">F&B Product</option>
-                            <option value="Engineering">Engineering</option>
-                            <option value="Security & Safety">Security & Safety</option>
-                            <option value="Sales & Marketing">Sales & Marketing</option>
-                            <option value="Human Resources">Human Resources</option>
-                            <option value="Accounting & Finance">Accounting & Finance</option>
-                        </select>
-                    </div>
-                    <div>
-                        <label class="block text-xs font-semibold text-gray-700 mb-1">Jabatan / Posisi Staf:</label>
-                        <input type="text" id="regPosition" required placeholder="Ketik jabatan Anda (cth: Receptionist, Waiter, Cook)" class="w-full border p-2 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500">
-                    </div>
-                    <div>
-                        <label class="block text-xs font-semibold text-gray-700 mb-1">Kata Sandi:</label>
-                        <div class="relative">
-                            <input type="password" id="regPassword" required minlength="6" placeholder="Minimal 6 karakter" class="w-full border p-2 pr-10 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500">
-                            <button type="button" onclick="togglePasswordVisibility('regPassword', 'regEyeIcon')" class="absolute inset-y-0 right-0 pr-3 flex items-center text-gray-400 hover:text-indigo-600">
-                                <i id="regEyeIcon" class="fa-solid fa-eye"></i>
-                            </button>
-                        </div>
-                    </div>
-                    <button type="submit" class="w-full bg-amber-500 hover:bg-amber-600 text-indigo-950 font-bold py-2.5 rounded-lg text-sm transition">
-                        Kirim Kode Verifikasi ke Gmail <i class="fa-solid fa-paper-plane ml-1"></i>
-                    </button>
-                </form>
-            </div>
-
-            <div id="otpVerifySection" class="hidden text-center py-2 space-y-4">
-                <div class="w-12 h-12 bg-indigo-50 text-indigo-600 rounded-full flex items-center justify-center mx-auto text-xl">
-                    <i class="fa-solid fa-envelope-circle-check"></i>
-                </div>
-                <div>
-                    <h3 class="font-bold text-gray-800 text-lg">Verifikasi Kode Gmail</h3>
-                    <p class="text-xs text-gray-500 mt-1">Kami telah mengirimkan kode verifikasi 6-digit ke email <b id="displayTargetEmail">email@gmail.com</b></p>
-                </div>
-                <div class="bg-amber-50 border border-amber-200 p-3 rounded-lg text-left text-xs space-y-1">
-                    <div class="font-bold text-amber-800 flex items-center justify-between">
-                        <span><i class="fa-brands fa-google text-red-500 mr-1"></i> [Simulasi Inbox Gmail]</span>
-                        <span class="text-[10px] text-amber-600">Baru saja</span>
-                    </div>
-                    <p class="text-amber-900">Kode OTP pembuatan akun Solia LMS Anda adalah: <b id="simulatedOtpCode" class="text-indigo-700 text-sm tracking-widest font-mono">123456</b></p>
-                </div>
-                <form onsubmit="handleVerifyOtpSubmit(event)" class="space-y-3">
-                    <input type="text" id="otpInput" maxlength="6" required placeholder="Masukkan 6 Digit OTP" class="w-full text-center text-lg tracking-widest border border-indigo-300 p-2 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500 font-mono">
-                    <button type="submit" class="w-full bg-indigo-600 hover:bg-indigo-700 text-white font-bold py-2.5 rounded-lg text-sm transition">Verifikasi & Buat Akun</button>
-                </form>
-            </div>
-        </div>
+        </main>
     </div>
 
-    <!-- SUPER ADMIN USER MANAGEMENT MODAL -->
-    <div id="adminUserModal" class="fixed inset-0 bg-black bg-opacity-60 hidden flex items-center justify-center p-4 z-50">
-        <div class="bg-white rounded-xl max-w-5xl w-full p-6 shadow-2xl relative max-h-[90vh] overflow-y-auto">
-            <button onclick="closeAdminUserModal()" class="absolute top-4 right-4 text-gray-400 hover:text-gray-600 text-xl">
-                <i class="fa-solid fa-xmark"></i>
-            </button>
-            <div class="border-b pb-3 mb-4 flex items-center space-x-2">
-                <i class="fa-solid fa-user-shield text-indigo-600 text-2xl"></i>
+    <!-- MODAL: MODULE VIEWER & QUIZ -->
+    <div id="moduleModal" class="fixed inset-0 bg-slate-900/70 z-50 flex items-center justify-center p-4 hidden">
+        <div class="bg-white rounded-2xl shadow-2xl max-w-4xl w-full max-h-[90vh] flex flex-col overflow-hidden">
+            <!-- Modal Header -->
+            <div class="px-6 py-4 bg-slate-900 text-white flex items-center justify-between">
                 <div>
-                    <h3 class="text-lg font-bold text-gray-800">Manajemen Hak Akses, Jabatan & Role Staf</h3>
-                    <p class="text-xs text-gray-500">Khusus Super Admin: Kelola jabatan staf, departemen, serta beri izin Manager/GM/Admin.</p>
+                    <span id="modalDeptTag" class="text-[10px] bg-blue-600 text-white px-2 py-0.5 rounded font-bold uppercase tracking-wider">Departemen</span>
+                    <h3 id="modalModuleTitle" class="text-base font-bold mt-1">Judul Modul Training</h3>
                 </div>
-            </div>
-            <div class="overflow-x-auto">
-                <table class="w-full text-xs text-left border-collapse">
-                    <thead>
-                        <tr class="bg-slate-100 text-slate-700 border-b">
-                            <th class="p-3">Nama Staf</th>
-                            <th class="p-3">Email</th>
-                            <th class="p-3">Jabatan / Posisi</th>
-                            <th class="p-3">Departemen</th>
-                            <th class="p-3">Level Peran / Permission</th>
-                            <th class="p-3 text-center">Aksi</th>
-                        </tr>
-                    </thead>
-                    <tbody id="userAdminTableBody" class="divide-y divide-slate-100"></tbody>
-                </table>
-            </div>
-        </div>
-    </div>
-
-    <!-- COURSE PLAYER MODAL (MEDIA PLAYER + AUTO TIMER) -->
-    <div id="courseModal" class="fixed inset-0 bg-black bg-opacity-60 hidden flex items-center justify-center p-4 z-50">
-        <div id="courseModalContent" class="bg-white rounded-xl max-w-4xl w-full p-6 shadow-2xl relative max-h-[90vh] overflow-y-auto transition-all duration-300 flex flex-col">
-            <div class="absolute top-4 right-4 flex items-center space-x-2 z-10">
-                <div class="text-xs bg-indigo-100 text-indigo-800 px-2.5 py-1 rounded-md font-mono flex items-center">
-                    <i class="fa-solid fa-stopwatch text-indigo-600 mr-1.5"></i> Durasi: <span id="liveStudyTimer" class="font-bold ml-1">00:00</span>
-                </div>
-                <button onclick="toggleFullscreenModal()" title="Layar Penuh" class="text-gray-500 hover:text-indigo-600 text-lg p-1 bg-gray-100 rounded-md transition">
-                    <i id="fullscreenIcon" class="fa-solid fa-expand"></i>
-                </button>
-                <button onclick="closeModal()" class="text-gray-400 hover:text-gray-600 text-xl p-1">
+                <button onclick="closeModuleModal()" class="text-slate-400 hover:text-white text-lg p-2 transition">
                     <i class="fa-solid fa-xmark"></i>
                 </button>
             </div>
-            
-            <div>
-                <span id="modalDept" class="text-xs font-semibold uppercase tracking-wider text-indigo-600 bg-indigo-50 px-2 py-1 rounded">Departemen</span>
-                <h2 id="modalTitle" class="text-xl font-bold mt-2 text-gray-800 pr-36">Judul Modul Pelatihan</h2>
-            </div>
-            
-            <div id="modalTabsNav" class="flex border-b border-gray-200 mt-4 space-x-4">
-                <button id="tabVideoBtn" onclick="switchMediaTab('video')" class="py-2 px-4 border-b-2 border-indigo-600 font-semibold text-indigo-600 text-sm">
-                    <i class="fa-solid fa-circle-play mr-1"></i> Video Tutorial
-                </button>
-                <button id="tabSlideBtn" onclick="switchMediaTab('slide')" class="py-2 px-4 border-b-2 border-transparent text-gray-500 hover:text-indigo-600 font-semibold text-sm">
-                    <i class="fa-solid fa-file-powerpoint mr-1"></i> Presentasi / Slide (PDF)
-                </button>
-            </div>
 
-            <div class="mt-4 flex-grow">
-                <div id="videoContainer" class="relative overflow-hidden rounded-lg bg-black aspect-video">
-                    <iframe id="videoIframe" class="w-full h-full" src="" title="Video Pembelajaran" frameborder="0" allowfullscreen></iframe>
-                </div>
-
-                <div id="slideContainer" class="hidden relative rounded-lg bg-slate-800 h-[60vh] border border-slate-200 overflow-auto flex flex-col items-center">
-                    <div id="pdfControls" class="sticky top-0 bg-slate-900/90 text-white w-full py-2 px-4 flex justify-between items-center z-10 text-xs">
-                        <div class="space-x-2">
-                            <button onclick="prevPDFPage()" class="bg-indigo-600 hover:bg-indigo-700 px-2.5 py-1 rounded"><i class="fa-solid fa-chevron-left"></i> Prev</button>
-                            <button onclick="nextPDFPage()" class="bg-indigo-600 hover:bg-indigo-700 px-2.5 py-1 rounded">Next <i class="fa-solid fa-chevron-right"></i></button>
+            <!-- Modal Body -->
+            <div class="flex-1 overflow-y-auto p-6 space-y-6 custom-scrollbar">
+                <!-- Study Timer Widget -->
+                <div class="bg-blue-50 border border-blue-200 rounded-xl p-4 flex items-center justify-between">
+                    <div class="flex items-center space-x-3">
+                        <div class="w-10 h-10 rounded-full bg-blue-600 text-white flex items-center justify-center font-bold text-sm">
+                            <i class="fa-solid fa-stopwatch"></i>
                         </div>
-                        <div>Halaman <span id="pdfPageNum">1</span> dari <span id="pdfPageCount">1</span></div>
-                    </div>
-                    <div class="p-4 flex justify-center w-full">
-                        <canvas id="pdfCanvas" class="shadow-lg max-w-full"></canvas>
-                    </div>
-                </div>
-            </div>
-
-            <div class="mt-6 flex justify-between items-center">
-                <span class="text-xs text-gray-500"><i class="fa-solid fa-clock mr-1"></i> Waktu belajar dicatat otomatis ke Log Rekap</span>
-                <button onclick="startModuleQuiz()" class="bg-indigo-600 hover:bg-indigo-700 text-white px-5 py-2 rounded-lg font-medium text-sm transition shadow flex items-center">
-                    Mulai Kuis Modul <i class="fa-solid fa-arrow-right ml-2"></i>
-                </button>
-            </div>
-        </div>
-    </div>
-
-    <!-- INTERACTIVE QUIZ MODAL -->
-    <div id="quizModal" class="fixed inset-0 bg-black bg-opacity-70 hidden flex items-center justify-center p-4 z-50">
-        <div class="bg-white rounded-xl max-w-2xl w-full p-6 shadow-2xl relative max-h-[90vh] overflow-y-auto">
-            <button onclick="closeQuizModal()" class="absolute top-4 right-4 text-gray-400 hover:text-gray-600 text-xl">
-                <i class="fa-solid fa-xmark"></i>
-            </button>
-
-            <div class="border-b pb-3 mb-4">
-                <span class="text-xs font-bold text-amber-600 bg-amber-50 px-2 py-0.5 rounded uppercase"><i class="fa-solid fa-pen-to-square mr-1"></i> Evaluasi Pemahaman</span>
-                <h3 id="quizModalTitle" class="text-xl font-bold text-gray-800 mt-1">Kuis Pemahaman Modul</h3>
-                <p class="text-xs text-gray-500 mt-0.5">Jawab pertanyaan-pertanyaan berikut berdasarkan materi modul yang telah dipelajari.</p>
-            </div>
-
-            <form id="quizForm" onsubmit="submitQuiz(event)">
-                <div id="quizQuestionsContainer" class="space-y-6"></div>
-
-                <div class="mt-6 pt-4 border-t flex justify-end space-x-3">
-                    <button type="button" onclick="closeQuizModal()" class="px-4 py-2 border border-gray-300 text-gray-600 rounded-lg text-sm font-semibold hover:bg-gray-50 transition">Batal</button>
-                    <button type="submit" class="px-5 py-2 bg-indigo-600 text-white rounded-lg text-sm font-bold hover:bg-indigo-700 transition shadow">
-                        <i class="fa-solid fa-check-circle mr-1"></i> Kirim Jawaban Kuis
-                    </button>
-                </div>
-            </form>
-
-            <div id="quizResultBox" class="hidden text-center py-6">
-                <div id="quizScoreBadge" class="w-20 h-20 rounded-full bg-green-100 text-green-600 flex items-center justify-center text-3xl font-extrabold mx-auto mb-3 shadow-inner">
-                    0
-                </div>
-                <h4 id="quizResultTitle" class="text-xl font-bold text-gray-800 mb-1">Hasil Kuis</h4>
-                <p id="quizResultDesc" class="text-sm text-gray-600 mb-6">Deskripsi hasil kuis.</p>
-                <div class="flex justify-center space-x-3">
-                    <button id="btnProceedEval" onclick="proceedToEvaluation()" class="bg-emerald-600 hover:bg-emerald-700 text-white px-6 py-2.5 rounded-lg text-sm font-bold transition shadow">
-                        Lanjut Isi Form Evaluasi Training <i class="fa-solid fa-arrow-right ml-1"></i>
-                    </button>
-                    <button id="btnRetryQuiz" onclick="startModuleQuiz()" class="hidden bg-amber-600 hover:bg-amber-700 text-white px-6 py-2.5 rounded-lg text-sm font-bold transition shadow">
-                        Ulangi Kuis
-                    </button>
-                </div>
-            </div>
-        </div>
-    </div>
-
-    <!-- EVALUATION FORM MODAL (STAFF) -->
-    <div id="evaluationModal" class="fixed inset-0 bg-black bg-opacity-70 hidden flex items-center justify-center p-4 z-50">
-        <div class="bg-white rounded-xl max-w-2xl w-full p-6 shadow-2xl relative max-h-[90vh] overflow-y-auto">
-            <div class="border-b pb-3 mb-4">
-                <span class="text-xs font-bold text-indigo-600 bg-indigo-50 px-2 py-0.5 rounded uppercase"><i class="fa-solid fa-comment-dots mr-1"></i> Feedback Pelatihan</span>
-                <h3 class="text-xl font-bold text-gray-800 mt-1">Form Evaluasi Training</h3>
-                <p class="text-xs text-gray-500 mt-0.5">Berikan penilaian dan masukan Anda terkait materi & penyelenggaraan training ini.</p>
-            </div>
-
-            <form id="evaluationForm" onsubmit="submitEvaluation(event)">
-                <div id="evalQuestionsContainer" class="space-y-4"></div>
-
-                <div class="mt-4">
-                    <label class="block text-xs font-bold text-gray-700 mb-1">Kritik & Saran Tambahan (Opsional):</label>
-                    <textarea id="evalComments" rows="3" placeholder="Tuliskan masukan Anda..." class="w-full border border-gray-300 p-2 rounded-lg text-xs focus:ring-2 focus:ring-indigo-500 focus:outline-none"></textarea>
-                </div>
-
-                <div class="mt-6 pt-4 border-t flex justify-end">
-                    <button type="submit" class="px-6 py-2.5 bg-emerald-600 text-white rounded-lg text-sm font-bold hover:bg-emerald-700 transition shadow">
-                        <i class="fa-solid fa-paper-plane mr-1.5"></i> Kirim Evaluasi & Selesaikan
-                    </button>
-                </div>
-            </form>
-        </div>
-    </div>
-
-    <!-- HRD EVALUATION QUESTION MANAGEMENT MODAL -->
-    <div id="hrdEvalModal" class="fixed inset-0 bg-black bg-opacity-60 hidden flex items-center justify-center p-4 z-50">
-        <div class="bg-white rounded-xl max-w-3xl w-full p-6 shadow-2xl relative max-h-[90vh] overflow-y-auto">
-            <button onclick="closeHrdEvalModal()" class="absolute top-4 right-4 text-gray-400 hover:text-gray-600 text-xl">
-                <i class="fa-solid fa-xmark"></i>
-            </button>
-
-            <div class="border-b pb-3 mb-4 flex justify-between items-center">
-                <div>
-                    <h3 class="text-lg font-bold text-gray-800"><i class="fa-solid fa-sliders text-indigo-600 mr-2"></i>Pengaturan Form Evaluasi HRD</h3>
-                    <p class="text-xs text-gray-500">Ubah, tambah, atau hapus pertanyaan evaluasi training yang wajib diisi karyawan.</p>
-                </div>
-                <button onclick="addHrdEvalQuestionField()" class="bg-indigo-50 text-indigo-600 hover:bg-indigo-100 font-bold px-3 py-1.5 rounded-lg text-xs transition border border-indigo-200">
-                    <i class="fa-solid fa-plus mr-1"></i> Tambah Pertanyaan
-                </button>
-            </div>
-
-            <div id="hrdEvalQuestionsList" class="space-y-3 mb-6"></div>
-
-            <div class="pt-3 border-t flex justify-end space-x-2">
-                <button onclick="closeHrdEvalModal()" class="px-4 py-2 border rounded-lg text-xs font-semibold">Batal</button>
-                <button onclick="saveHrdEvalQuestions()" class="px-5 py-2 bg-indigo-600 text-white rounded-lg text-xs font-bold hover:bg-indigo-700 transition shadow">
-                    Simpan Pertanyaan Evaluasi
-                </button>
-            </div>
-        </div>
-    </div>
-
-    <!-- UPLOAD MODULE MODAL -->
-    <div id="uploadModal" class="fixed inset-0 bg-black bg-opacity-60 hidden flex items-center justify-center p-4 z-50">
-        <div class="bg-white rounded-xl max-w-2xl w-full p-6 shadow-2xl relative max-h-[90vh] overflow-y-auto">
-            <button onclick="closeUploadModal()" class="absolute top-4 right-4 text-gray-400 hover:text-gray-600 text-xl">
-                <i class="fa-solid fa-xmark"></i>
-            </button>
-
-            <h3 class="text-lg font-bold text-gray-800 border-b pb-3 mb-4">
-                <i class="fa-solid fa-cloud-arrow-up text-indigo-600 mr-2"></i>Upload File PDF & Tambahkan Kuis (Wajib)
-            </h3>
-
-            <form id="uploadForm" onsubmit="handleFormSubmit(event)" class="space-y-4">
-                <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-                    <div>
-                        <label class="block text-xs font-semibold text-gray-700 mb-1">Pilih Departemen Tujuan:</label>
-                        <select id="formDept" required class="w-full border border-gray-300 p-2 rounded-lg text-sm focus:ring-2 focus:ring-indigo-500 focus:outline-none">
-                            <option value="" disabled selected>-- Pilih Departemen --</option>
-                            <option value="Front Office">Front Office (FO)</option>
-                            <option value="Housekeeping">Housekeeping (HK)</option>
-                            <option value="F&B Service">F&B Service</option>
-                            <option value="F&B Product">F&B Product (Kitchen)</option>
-                            <option value="Engineering">Engineering</option>
-                            <option value="Security & Safety">Security & Safety</option>
-                            <option value="Sales & Marketing">Sales & Marketing</option>
-                            <option value="Human Resources">Human Resources</option>
-                            <option value="Accounting & Finance">Accounting & Finance</option>
-                        </select>
-                    </div>
-
-                    <div>
-                        <label class="block text-xs font-semibold text-gray-700 mb-1">Hak Akses Modul:</label>
-                        <select id="formPermission" class="w-full border border-gray-300 p-2 rounded-lg text-sm focus:ring-2 focus:ring-indigo-500 focus:outline-none bg-white">
-                            <option value="ALL">Semua Departemen (Publik)</option>
-                            <option value="INTERNAL">Khusus Internal Departemen Ini</option>
-                        </select>
-                    </div>
-                </div>
-
-                <div>
-                    <label class="block text-xs font-semibold text-gray-700 mb-1">Judul Modul Presentasi / SOP Baru:</label>
-                    <input type="text" id="formTitle" required placeholder="Contoh: Modul Standard Grooming Front Office" class="w-full border border-gray-300 p-2 rounded-lg text-sm focus:ring-2 focus:ring-indigo-500 focus:outline-none">
-                </div>
-
-                <div class="border border-indigo-100 bg-indigo-50/50 p-3 rounded-lg space-y-2">
-                    <label class="block text-xs font-bold text-indigo-900">
-                        <i class="fa-solid fa-file-pdf text-indigo-600 mr-1"></i> File PDF / Presentasi SOP:
-                    </label>
-                    <input type="file" id="formLocalFile" accept=".pdf" required class="w-full text-xs text-gray-500 file:mr-3 file:py-2 file:px-3 file:rounded-lg file:border-0 file:text-xs file:font-semibold file:bg-indigo-600 file:text-white hover:file:bg-indigo-700 cursor-pointer border border-gray-300 rounded-lg p-1 bg-white">
-                </div>
-
-                <div>
-                    <label class="block text-xs font-semibold text-gray-700 mb-1">URL Embed Video (Opsional):</label>
-                    <input type="url" id="formVideoUrl" placeholder="https://www.youtube.com/embed/..." class="w-full border border-gray-300 p-2 rounded-lg text-sm focus:ring-2 focus:ring-indigo-500 focus:outline-none">
-                </div>
-
-                <div class="border-t pt-4 mt-6">
-                    <div class="flex justify-between items-center mb-3">
                         <div>
-                            <h4 class="text-sm font-bold text-gray-800"><i class="fa-solid fa-list-check text-indigo-600 mr-1.5"></i> Buat Kuis & Kunci Jawaban <span class="text-red-500">*Wajib</span></h4>
-                            <p class="text-[11px] text-amber-700 font-semibold">Trainer wajib membuat minimal 1 soal kuis beserta kunci jawaban agar materi dapat di-upload.</p>
+                            <div class="text-xs font-semibold text-blue-900">Sesi Belajar Aktif Berjalan</div>
+                            <div class="text-xs text-blue-700">Waktu tercatat otomatis untuk progress bulanan (Min. 10 Jam)</div>
                         </div>
-                        <button type="button" onclick="addManualQuestionField()" class="bg-indigo-50 text-indigo-600 hover:bg-indigo-100 font-bold px-3 py-1.5 rounded-lg text-xs transition border border-indigo-200">
-                            <i class="fa-solid fa-plus mr-1"></i> Tambah Soal
-                        </button>
                     </div>
-
-                    <div id="manualQuestionsContainer" class="space-y-4 max-h-[300px] overflow-y-auto pr-1"></div>
+                    <div id="studyTimerDisplay" class="text-xl font-mono font-bold text-blue-900 bg-white px-4 py-1.5 rounded-lg border border-blue-300 shadow-xs">
+                        00:00
+                    </div>
                 </div>
 
-                <div class="pt-3">
-                    <button type="submit" id="btnSubmitForm" class="w-full bg-indigo-600 hover:bg-indigo-700 text-white py-2.5 rounded-lg font-bold text-sm transition shadow">
-                        <i class="fa-solid fa-paper-plane mr-1"></i> Publisikan Modul & Kuis
+                <!-- Content Container -->
+                <div id="modalContentContainer" class="bg-slate-100 rounded-xl border border-slate-200 p-4 min-h-[300px] flex flex-col items-center justify-center"></div>
+
+                <!-- Quiz Section -->
+                <div class="bg-white rounded-xl border border-slate-200 p-6 space-y-4">
+                    <div class="border-b border-slate-100 pb-3 flex items-center justify-between">
+                        <h4 class="font-bold text-slate-900 text-sm"><i class="fa-solid fa-circle-question text-blue-600 mr-2"></i>Kuis Evaluasi Pemahaman Modul</h4>
+                        <span class="text-xs text-slate-500 font-medium">Syarat Kelulusan: Skor >= 70</span>
+                    </div>
+                    <div id="quizQuestionsContainer" class="space-y-4"></div>
+                    <button onclick="submitQuiz()" class="w-full bg-blue-600 hover:bg-blue-700 text-white font-medium py-2.5 rounded-lg text-sm shadow-sm transition">
+                        Kirim Jawaban Kuis
                     </button>
                 </div>
-            </form>
+
+                <!-- Training Evaluation Feedback Form -->
+                <div class="bg-slate-50 rounded-xl border border-slate-200 p-6 space-y-4">
+                    <h4 class="font-bold text-slate-900 text-sm"><i class="fa-solid fa-star text-amber-500 mr-2"></i>Form Evaluasi & Umpan Balik Training</h4>
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                        <div>
+                            <label class="block text-xs font-semibold text-slate-600 mb-1">Kejelasan Materi (1-5)</label>
+                            <select id="evalClarity" class="w-full px-3 py-2 rounded-lg border border-slate-300 text-xs bg-white">
+                                <option value="5">5 - Sangat Jelas & Mudah Dipahami</option>
+                                <option value="4">4 - Jelas</option>
+                                <option value="3">3 - Cukup</option>
+                                <option value="2">2 - Kurang Jelas</option>
+                                <option value="1">1 - Sangat Kurang</option>
+                            </select>
+                        </div>
+                        <div>
+                            <label class="block text-xs font-semibold text-slate-600 mb-1">Relevansi dengan Tugas Hotel (1-5)</label>
+                            <select id="evalRelevance" class="w-full px-3 py-2 rounded-lg border border-slate-300 text-xs bg-white">
+                                <option value="5">5 - Sangat Relevan</option>
+                                <option value="4">4 - Relevan</option>
+                                <option value="3">3 - Cukup</option>
+                                <option value="2">2 - Kurang</option>
+                                <option value="1">1 - Tidak Relevan</option>
+                            </select>
+                        </div>
+                    </div>
+                    <div>
+                        <label class="block text-xs font-semibold text-slate-600 mb-1">Komentar / Saran Perbaikan</label>
+                        <textarea id="evalComment" rows="2" class="w-full px-3 py-2 rounded-lg border border-slate-300 text-xs" placeholder="Tuliskan masukan atau kendala operasional..."></textarea>
+                    </div>
+                    <button onclick="submitEvaluation()" class="bg-slate-800 hover:bg-slate-900 text-white px-4 py-2 rounded-lg text-xs font-medium transition">
+                        Kirim Evaluasi Training
+                    </button>
+                </div>
+            </div>
         </div>
     </div>
 
-    <!-- LOGIC SYSTEM & SCRIPT INTEGRATION -->
+    <!-- MODAL: ADD / EDIT STAFF (SUPER ADMIN) -->
+    <div id="userModal" class="fixed inset-0 bg-slate-900/70 z-50 flex items-center justify-center p-4 hidden">
+        <div class="bg-white rounded-2xl shadow-2xl max-w-md w-full p-6 space-y-4">
+            <h3 id="userModalTitle" class="text-base font-bold text-slate-900">Tambah Akun Staff Baru</h3>
+            <input type="hidden" id="editUserEmailOriginal">
+            <div>
+                <label class="block text-xs font-semibold text-slate-600 mb-1">Nama Lengkap</label>
+                <input type="text" id="adminModalName" class="w-full px-3 py-2 rounded-lg border border-slate-300 text-xs">
+            </div>
+            <div>
+                <label class="block text-xs font-semibold text-slate-600 mb-1">Email Hotel</label>
+                <input type="email" id="adminModalEmail" class="w-full px-3 py-2 rounded-lg border border-slate-300 text-xs">
+            </div>
+            <div>
+                <label class="block text-xs font-semibold text-slate-600 mb-1">Departemen</label>
+                <select id="adminModalDept" class="w-full px-3 py-2 rounded-lg border border-slate-300 text-xs bg-white">
+                    <option value="Front Office">Front Office</option>
+                    <option value="Housekeeping">Housekeeping</option>
+                    <option value="F&B Service">F&B Service</option>
+                    <option value="F&B Product (Kitchen)">F&B Product (Kitchen)</option>
+                    <option value="Engineering">Engineering</option>
+                    <option value="Security & Safety">Security & Safety</option>
+                    <option value="Sales & Marketing">Sales & Marketing</option>
+                    <option value="Human Resources">Human Resources</option>
+                    <option value="Accounting & Finance">Accounting & Finance</option>
+                </select>
+            </div>
+            <div>
+                <label class="block text-xs font-semibold text-slate-600 mb-1">Role Akses</label>
+                <select id="adminModalRole" class="w-full px-3 py-2 rounded-lg border border-slate-300 text-xs bg-white">
+                    <option value="Staff">Staff</option>
+                    <option value="Manager">Manager</option>
+                    <option value="General Manager">General Manager</option>
+                    <option value="Super Admin">Super Admin</option>
+                </select>
+            </div>
+            <div class="flex justify-end space-x-2 pt-2">
+                <button onclick="closeUserModal()" class="px-4 py-2 rounded-lg text-xs font-medium text-slate-600 hover:bg-slate-100">Batal</button>
+                <button onclick="saveUserModal()" class="px-4 py-2 rounded-lg text-xs font-medium bg-blue-600 hover:bg-blue-700 text-white">Simpan</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- APPLICATION SCRIPT -->
     <script>
-        // --- DASHBOARD TAB NAVIGATION ---
-        function switchMainTab(tabName) {
-            const secMateri = document.getElementById('sectionMateriTraining');
-            const secAttendance = document.getElementById('sectionAttendance');
-            const secLog = document.getElementById('sectionLogRekap');
-
-            const btnMateri = document.getElementById('navMateriBtn');
-            const btnAttendance = document.getElementById('navAttendanceBtn');
-            const btnLog = document.getElementById('navLogBtn');
-
-            const activeClass = "py-3 px-5 border-b-2 border-indigo-600 font-bold text-indigo-600 text-sm whitespace-nowrap";
-            const inactiveClass = "py-3 px-5 border-b-2 border-transparent text-gray-500 hover:text-indigo-600 font-semibold text-sm whitespace-nowrap";
-
-            secMateri.classList.add('hidden');
-            secAttendance.classList.add('hidden');
-            secLog.classList.add('hidden');
-
-            btnMateri.className = inactiveClass;
-            btnAttendance.className = inactiveClass;
-            btnLog.className = inactiveClass;
-
-            if (tabName === 'materi') {
-                secMateri.classList.remove('hidden');
-                btnMateri.className = activeClass;
-            } else if (tabName === 'attendance') {
-                secAttendance.classList.remove('hidden');
-                btnAttendance.className = activeClass;
-            } else if (tabName === 'log') {
-                secLog.classList.remove('hidden');
-                btnLog.className = activeClass;
-                renderLogTable();
-            }
-        }
-
-        // --- ATTENDANCE SYSTEM ---
-        let currentClockIn = null;
-
-        function handleClockIn() {
-            if (!currentUser) {
-                alert('Silakan login terlebih dahulu untuk melakukan presensi!');
-                openAuthModal('login');
-                return;
-            }
-            currentClockIn = new Date();
-            const timeStr = currentClockIn.toLocaleTimeString();
-            document.getElementById('clockInTimeDisplay').innerText = timeStr;
-            document.getElementById('attendanceStatusBadge').className = "inline-block px-3 py-1 bg-emerald-100 text-emerald-700 rounded-full text-xs font-bold";
-            document.getElementById('attendanceStatusBadge').innerText = "Sedang Sesi Training";
-            alert(`Clock In Berhasil pada pukul ${timeStr}`);
-        }
-
-        function handleClockOut() {
-            if (!currentClockIn) {
-                alert('Anda belum melakukan Clock In!');
-                return;
-            }
-            const clockOut = new Date();
-            const timeStr = clockOut.toLocaleTimeString();
-            document.getElementById('clockOutTimeDisplay').innerText = timeStr;
-            document.getElementById('attendanceStatusBadge').className = "inline-block px-3 py-1 bg-blue-100 text-blue-700 rounded-full text-xs font-bold";
-            document.getElementById('attendanceStatusBadge').innerText = "Sesi Selesai";
-            
-            currentClockIn = null;
-            alert(`Clock Out Berhasil pada pukul ${timeStr}`);
-        }
-
-        function exportMonthlyReport() {
-            alert('Mengunduh Laporan Rekap Bulanan Karyawan (CSV/PDF)...');
-        }
-
-        // --- TOGGLE PASSWORD VISIBILITY ---
-        function togglePasswordVisibility(inputId, iconId) {
-            const passwordInput = document.getElementById(inputId);
-            const eyeIcon = document.getElementById(iconId);
-
-            if (passwordInput.type === 'password') {
-                passwordInput.type = 'text';
-                eyeIcon.classList.remove('fa-eye');
-                eyeIcon.classList.add('fa-eye-slash');
-            } else {
-                passwordInput.type = 'password';
-                eyeIcon.classList.remove('fa-eye-slash');
-                eyeIcon.classList.add('fa-eye');
-            }
-        }
-
-        function resetPasswordInputs() {
-            const loginPass = document.getElementById('loginPassword');
-            const loginIcon = document.getElementById('loginEyeIcon');
-            const regPass = document.getElementById('regPassword');
-            const regIcon = document.getElementById('regEyeIcon');
-
-            if (loginPass) loginPass.type = 'password';
-            if (loginIcon) {
-                loginIcon.classList.remove('fa-eye-slash');
-                loginIcon.classList.add('fa-eye');
-            }
-            if (regPass) regPass.type = 'password';
-            if (regIcon) {
-                regIcon.classList.remove('fa-eye-slash');
-                regIcon.classList.add('fa-eye');
-            }
-        }
-
-        // GLOBAL STATE
-        let currentUser = null;
-        let pendingRegistration = null;
-        let generatedOtpCode = null;
-
-        let activeDepartment = "";
-        let activeFilterType = "ALL";
-        let currentActiveModule = null;
-        let isFullscreen = false;
-
-        // Timers
-        let studyStartTime = null;
-        let studyTimerInterval = null;
-        let activeStudyDurationSeconds = 0;
-        
-        // PDF Render State
-        let pdfDoc = null;
-        let pageNum = 1;
-        let pageRendering = false;
-        let pageNumPending = null;
-        const scale = 1.2;
-        const canvas = document.getElementById('pdfCanvas');
-        const ctx = canvas ? canvas.getContext('2d') : null;
-
-        // Default Users
-        const defaultUsers = [
-            { id: 'u-admin-itm', name: 'IT Manager (Super Admin)', email: 'itm@solialegian.com', password: '@dmin16S0l', dept: 'Accounting & Finance', position: 'IT Manager', role: 'Super Admin' },
-            { id: 'u-admin-darmadi', name: 'Darmadi (Super Admin)', email: 'darmadibali23@gmail.com', password: 'Darmadi13#', dept: 'Human Resources', position: 'HR Manager', role: 'Super Admin' },
-            { id: 'u-admin', name: 'Super Admin', email: 'admin@solia.com', password: 'admin123', dept: 'Human Resources', position: 'System Admin', role: 'Super Admin' },
-            { id: 'u-gm', name: 'Pak General Manager', email: 'gm@solia.com', password: 'gm123', dept: 'Management', position: 'General Manager', role: 'General Manager' },
-            { id: 'u-mgr', name: 'Manager FO', email: 'mgr.fo@solia.com', password: 'mgr123', dept: 'Front Office', position: 'Front Office Manager', role: 'Manager' }
+        const departments = [
+            "Front Office", "Housekeeping", "F&B Service", "F&B Product (Kitchen)", 
+            "Engineering", "Security & Safety", "Sales & Marketing", "Human Resources", "Accounting & Finance"
         ];
 
-        // Default SOP Modules
-        const defaultSopModules = [
-            { 
-                id: 'sop-fo', 
-                dept: 'Front Office', 
-                title: 'Check-In Standard Operating Procedure', 
-                type: 'SOP', 
-                permission: 'ALL', 
-                slideUrl: 'https://raw.githubusercontent.com/mozilla/pdf.js/ba2edeae/web/compressed.tracemonkey-pldi-09.pdf', 
-                generatedQuestions: [{ question: "Apa langkah utama saat pendaftaran tamu?", options: ["Langsung beri kunci", "Verifikasi identitas & data reservasi", "Abaikan tamu", "Tarik biaya ekstra"], answer: 1 }] 
+        let modulesData = [
+            {
+                id: "fo-01",
+                dept: "Front Office",
+                title: "Standard Check-in & Guest Welcome SOP",
+                type: "SOP",
+                duration: "30 Menit",
+                desc: "Panduan penyambutan tamu di lobby, verifikasi paspor/KTP, dan prosedur keycard encoding Solia Legian Bali.",
+                contentUrl: "https://raw.githubusercontent.com/mozilla/pdf.js/ba2edeae/web/compressed.tracemonkey-pldi-09.pdf",
+                questions: [
+                    { q: "Apa salam standar yang diucapkan saat tamu tiba di Front Desk?", options: ["Halo selamat pagi", "Selamat pagi/siang/malam, selamat datang di Solia Legian Bali", "Ada yang bisa dibantu?", "Silakan isi buku tamu"], answer: 1 },
+                    { q: "Dokumen identitas apa yang wajib diminta saat check-in WNA?", options: ["KTP", "SIM", "Paspor & KITAS/Visa", "Kartu Pelajar"], answer: 2 }
+                ]
             },
-            { 
-                id: 'sop-hk', 
-                dept: 'Housekeeping', 
-                title: 'Room Making & Bed Setup Standard', 
-                type: 'SOP', 
-                permission: 'ALL', 
-                slideUrl: 'https://raw.githubusercontent.com/mozilla/pdf.js/ba2edeae/web/compressed.tracemonkey-pldi-09.pdf', 
-                generatedQuestions: [{ question: "Berapa kali ketuk pintu sebelum masuk kamar?", options: ["1 Kali", "2 Kali", "3 Kali sambil sebut 'Housekeeping'", "Tidak perlu ketuk"], answer: 2 }] 
+            {
+                id: "fo-02",
+                dept: "Front Office",
+                title: "Handling Guest Complaints & Recovery",
+                type: "Video",
+                duration: "25 Menit",
+                desc: "Teknik HEAR (Hear, Empathize, Apologize, Resolve) dalam menghadapi komplain tamu hotel secara profesional.",
+                contentUrl: "https://www.w3schools.com/html/mov_bbb.mp4",
+                questions: [
+                    { q: "Apa kepanjangan dari teknik HEAR dalam penanganan komplain?", options: ["Hear, Ensure, Act, Report", "Hear, Empathize, Apologize, Resolve", "Hotels Elite Accurate Room", "Help Empathy Assist Review"], answer: 1 }
+                ]
+            },
+            {
+                id: "hk-01",
+                dept: "Housekeeping",
+                title: "Room Cleaning & Sanitization Standard",
+                type: "PDF",
+                duration: "45 Menit",
+                desc: "Standar kebersihan kamar tamu, penggantian linen, dan disinfeksi area high-touch sesuai protokol Solia.",
+                contentUrl: "https://raw.githubusercontent.com/mozilla/pdf.js/ba2edeae/web/compressed.tracemonkey-pldi-09.pdf",
+                questions: [
+                    { q: "Berapa lama estimasi standar pembersihan satu kamar tipe Deluxe?", options: ["10 Menit", "20 Menit", "45 Menit", "90 Menit"], answer: 2 }
+                ]
+            },
+            {
+                id: "fbs-01",
+                dept: "F&B Service",
+                title: "Restaurant Fine Dining Table Setup",
+                type: "SOP",
+                duration: "20 Menit",
+                desc: "Penataan cutlery, glassware, dan napkin folding untuk sarapan pagi dan gala dinner restoran hotel.",
+                contentUrl: "https://raw.githubusercontent.com/mozilla/pdf.js/ba2edeae/web/compressed.tracemonkey-pldi-09.pdf",
+                questions: [
+                    { q: "Di sebelah mana posisi penempatan garpu (fork) saat table setup standar?", options: ["Sebelah kanan piring", "Sebelah kiri piring", "Di atas piring", "Di dalam gelas"], answer: 1 }
+                ]
+            },
+            {
+                id: "eng-01",
+                dept: "Engineering",
+                title: "Hotel HVAC & Generator Maintenance",
+                type: "SOP",
+                duration: "40 Menit",
+                desc: "Prosedur perawatan berkala AC pendingin ruangan publik dan pengoperasian genset darurat hotel.",
+                contentUrl: "https://raw.githubusercontent.com/mozilla/pdf.js/ba2edeae/web/compressed.tracemonkey-pldi-09.pdf",
+                questions: [
+                    { q: "Berapa sering filter AC kamar tamu harus dibersihkan secara berkala?", options: ["Setiap hari", "Setiap 2 minggu sekali", "Setiap tahun", "Tidak pernah"], answer: 1 }
+                ]
             }
         ];
 
-        // Default HRD Evaluation Questions
-        const defaultHrdQuestions = [
-            "Materi pembelajaran disajikan dengan jelas dan mudah dipahami.",
-            "Topik pelatihan sangat relevan dengan pekerjaan sehari-hari saya.",
-            "Fasilitas / Media LMS sangat mendukung kelancaran proses belajar."
+        let usersData = [
+            { name: "Budi Santoso", email: "budi.santoso@solialegian.com", dept: "Front Office", role: "Staff" },
+            { name: "Siti Rahma", email: "siti.rahma@solialegian.com", dept: "Housekeeping", role: "Staff" },
+            { name: "Wayan Wirawan", email: "wayan.wirawan@solialegian.com", dept: "Engineering", role: "Manager" },
+            { name: "Super Admin Solia", email: "admin@solialegian.com", dept: "Human Resources", role: "Super Admin" }
         ];
 
-        function getUsersDB() {
-            let users = localStorage.getItem('solia_lms_users');
-            if (!users) {
-                localStorage.setItem('solia_lms_users', JSON.stringify(defaultUsers));
-                return defaultUsers;
-            }
-            let parsedUsers = JSON.parse(users);
-            if (!parsedUsers.some(u => u.email.toLowerCase() === 'itm@solialegian.com')) {
-                parsedUsers.push(defaultUsers[0]);
-                localStorage.setItem('solia_lms_users', JSON.stringify(parsedUsers));
-            }
-            return parsedUsers;
-        }
+        let attendanceLogs = [];
+        let trainingLogs = [];
+        let currentUser = null;
+        let generatedOtpCode = "";
+        let currentActiveModule = null;
+        let studyTimerInterval = null;
+        let studySecondsCount = 0;
 
-        function saveUsersDB(users) {
-            localStorage.setItem('solia_lms_users', JSON.stringify(users));
-        }
+        // --- CLOCK WIDGET ---
+        setInterval(() => {
+            const now = new Date();
+            const timeStr = now.toLocaleTimeString('id-ID', { timeZone: 'Asia/Makassar' });
+            const dateStr = now.toLocaleDateString('id-ID', { timeZone: 'Asia/Makassar', weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' });
+            const clockEl = document.getElementById('liveClock');
+            if (clockEl) clockEl.innerText = timeStr + " WITA";
+            const dateEl = document.getElementById('liveDate');
+            if (dateEl) dateEl.innerText = dateStr;
+        }, 1000);
 
-        function getHrdQuestions() {
-            let q = localStorage.getItem('solia_lms_hrd_questions');
-            return q ? JSON.parse(q) : defaultHrdQuestions;
-        }
-
-        function saveHrdQuestions(questions) {
-            localStorage.setItem('solia_lms_hrd_questions', JSON.stringify(questions));
-        }
-
-        function getStudyLogs() {
-            let logs = localStorage.getItem('solia_lms_study_logs');
-            return logs ? JSON.parse(logs) : [];
-        }
-
-        function saveStudyLogs(logs) {
-            localStorage.setItem('solia_lms_study_logs', JSON.stringify(logs));
-        }
-
-        function openAuthModal(tab = 'login') {
-            document.getElementById('authModal').classList.remove('hidden');
-            switchAuthTab(tab);
-        }
-
-        function closeAuthModal() {
-            document.getElementById('authModal').classList.add('hidden');
-            document.getElementById('otpVerifySection').classList.add('hidden');
-            document.getElementById('authFormsContainer').classList.remove('hidden');
-            resetPasswordInputs();
-        }
-
-        function switchAuthTab(tab) {
-            const loginForm = document.getElementById('loginForm');
-            const regForm = document.getElementById('registerForm');
-            const tabLoginBtn = document.getElementById('tabLoginBtn');
-            const tabRegBtn = document.getElementById('tabRegisterBtn');
-
-            resetPasswordInputs();
-
-            if (tab === 'login') {
-                loginForm.classList.remove('hidden');
-                regForm.classList.add('hidden');
-                tabLoginBtn.className = "flex-1 py-2 font-bold text-sm border-b-2 border-indigo-600 text-indigo-600";
-                tabRegBtn.className = "flex-1 py-2 font-bold text-sm border-b-2 border-transparent text-gray-400";
-            } else {
-                regForm.classList.remove('hidden');
-                loginForm.classList.add('hidden');
-                tabRegBtn.className = "flex-1 py-2 font-bold text-sm border-b-2 border-indigo-600 text-indigo-600";
-                tabLoginBtn.className = "flex-1 py-2 font-bold text-sm border-b-2 border-transparent text-gray-400";
-            }
-        }
-
-        function handleLoginSubmit(e) {
-            e.preventDefault();
+        // --- AUTHENTICATION FLOW ---
+        function requestOTP() {
+            const name = document.getElementById('loginName').value.trim();
             const email = document.getElementById('loginEmail').value.trim();
-            const password = document.getElementById('loginPassword').value;
+            const dept = document.getElementById('loginDept').value;
 
-            const users = getUsersDB();
-            const foundUser = users.find(u => u.email.toLowerCase() === email.toLowerCase() && u.password === password);
-
-            if (foundUser) {
-                currentUser = foundUser;
-                updateAuthUI();
-                closeAuthModal();
-                alert(`Selamat Datang kembali, ${currentUser.name}! (${currentUser.position || currentUser.role})`);
-                if (activeDepartment) renderDepartmentDetail();
-                updateDashboardStats();
-            } else {
-                alert('Email atau kata sandi tidak cocok. Silakan periksa kembali!');
-            }
-        }
-
-        function handleRegisterSubmit(e) {
-            e.preventDefault();
-            const name = document.getElementById('regName').value.trim();
-            const email = document.getElementById('regEmail').value.trim();
-            const dept = document.getElementById('regDept').value;
-            const position = document.getElementById('regPosition').value.trim();
-            const password = document.getElementById('regPassword').value;
-
-            const users = getUsersDB();
-            if (users.some(u => u.email.toLowerCase() === email.toLowerCase())) {
-                alert('Email ini sudah terdaftar! Silakan login.');
+            if (!name || !email) {
+                alert("Harap isi Nama Lengkap dan Email terlebih dahulu!");
                 return;
             }
 
             generatedOtpCode = Math.floor(100000 + Math.random() * 900000).toString();
-            pendingRegistration = { name, email, dept, position, password, role: 'Staff' };
-
-            document.getElementById('authFormsContainer').classList.add('hidden');
-            document.getElementById('otpVerifySection').classList.remove('hidden');
-            document.getElementById('displayTargetEmail').innerText = email;
-            document.getElementById('simulatedOtpCode').innerText = generatedOtpCode;
-        }
-
-        function handleVerifyOtpSubmit(e) {
-            e.preventDefault();
-            const inputOtp = document.getElementById('otpInput').value.trim();
-
-            if (inputOtp === generatedOtpCode && pendingRegistration) {
-                const users = getUsersDB();
-                const newUser = { id: 'usr-' + Date.now(), ...pendingRegistration };
-                users.push(newUser);
-                saveUsersDB(users);
-
-                currentUser = newUser;
-                updateAuthUI();
-                closeAuthModal();
-
-                alert(`Registrasi Berhasil!\n\nAkun Anda (${newUser.name} - ${newUser.position}) telah terverifikasi.`);
-                pendingRegistration = null;
-                generatedOtpCode = null;
-                document.getElementById('otpInput').value = '';
-                if (activeDepartment) renderDepartmentDetail();
-                updateDashboardStats();
-            } else {
-                alert('Kode OTP yang Anda masukkan salah!');
-            }
-        }
-
-        function handleLogout() {
-            if (confirm('Apakah Anda yakin ingin keluar dari akun?')) {
-                currentUser = null;
-                updateAuthUI();
-                if (activeDepartment) renderDepartmentDetail();
-                updateDashboardStats();
-            }
-        }
-
-        function updateAuthUI() {
-            const authSection = document.getElementById('authButtonsSection');
-            const userSection = document.getElementById('userInfoSection');
-            const nameDisplay = document.getElementById('userNameDisplay');
-            const roleBadge = document.getElementById('userRoleBadge');
-            const uploadBtn = document.getElementById('uploadMateriBtn');
-            const adminBtn = document.getElementById('adminUserMgmtBtn');
-            const hrdBtn = document.getElementById('hrdEvalMgmtBtn');
-
-            if (currentUser) {
-                authSection.classList.add('hidden');
-                userSection.classList.remove('hidden');
-                userSection.classList.add('flex');
-                nameDisplay.innerText = currentUser.name;
-                
-                const posStr = currentUser.position ? `${currentUser.position} • ` : '';
-                roleBadge.innerText = `${posStr}${currentUser.role} (${currentUser.dept})`;
-
-                if (['Manager', 'General Manager', 'Super Admin'].includes(currentUser.role)) {
-                    uploadBtn.classList.remove('hidden');
-                    uploadBtn.classList.add('flex');
-                } else {
-                    uploadBtn.classList.add('hidden');
-                }
-
-                if (currentUser.role === 'Super Admin') {
-                    adminBtn.classList.remove('hidden');
-                } else {
-                    adminBtn.classList.add('hidden');
-                }
-
-                if (currentUser.role === 'Super Admin' || currentUser.dept === 'Human Resources') {
-                    hrdBtn.classList.remove('hidden');
-                } else {
-                    hrdBtn.classList.add('hidden');
-                }
-            } else {
-                authSection.classList.remove('hidden');
-                userSection.classList.add('hidden');
-                uploadBtn.classList.add('hidden');
-                adminBtn.classList.add('hidden');
-                hrdBtn.classList.add('hidden');
-            }
-        }
-
-        function openAdminUserModal() {
-            if (!currentUser || currentUser.role !== 'Super Admin') return;
-            renderAdminUserTable();
-            document.getElementById('adminUserModal').classList.remove('hidden');
-        }
-
-        function closeAdminUserModal() {
-            document.getElementById('adminUserModal').classList.add('hidden');
-        }
-
-        function renderAdminUserTable() {
-            const tbody = document.getElementById('userAdminTableBody');
-            tbody.innerHTML = '';
-            const users = getUsersDB();
-
-            users.forEach(u => {
-                const tr = document.createElement('tr');
-                tr.className = "hover:bg-slate-50";
-
-                tr.innerHTML = `
-                    <td class="p-3 font-semibold text-slate-800">${u.name}</td>
-                    <td class="p-3 text-slate-600">${u.email}</td>
-                    <td class="p-3">
-                        <input type="text" value="${u.position || 'Staff'}" onchange="updateUserPosition('${u.id}', this.value)" class="border rounded p-1 text-xs w-full bg-white focus:ring-1 focus:ring-indigo-500">
-                    </td>
-                    <td class="p-3">
-                        <select onchange="updateUserDept('${u.id}', this.value)" class="border rounded p-1 text-xs">
-                            ${['Front Office','Housekeeping','F&B Service','F&B Product','Engineering','Security & Safety','Sales & Marketing','Human Resources','Accounting & Finance'].map(d => `<option value="${d}" ${u.dept === d ? 'selected' : ''}>${d}</option>`).join('')}
-                        </select>
-                    </td>
-                    <td class="p-3">
-                        <select onchange="updateUserRole('${u.id}', this.value)" class="border rounded p-1 font-bold text-xs bg-white text-indigo-700">
-                            <option value="Staff" ${u.role === 'Staff' ? 'selected' : ''}>Staff</option>
-                            <option value="Manager" ${u.role === 'Manager' ? 'selected' : ''}>Manager</option>
-                            <option value="General Manager" ${u.role === 'General Manager' ? 'selected' : ''}>General Manager (GM)</option>
-                            <option value="Super Admin" ${u.role === 'Super Admin' ? 'selected' : ''}>Super Admin</option>
-                        </select>
-                    </td>
-                    <td class="p-3 text-center">
-                        ${u.id !== currentUser.id ? `<button onclick="deleteUser('${u.id}')" class="text-red-500 hover:text-red-700"><i class="fa-solid fa-trash"></i></button>` : '<span class="text-xs text-gray-400">Akun Anda</span>'}
-                    </td>
-                `;
-                tbody.appendChild(tr);
-            });
-        }
-
-        function updateUserPosition(userId, newPosition) {
-            let users = getUsersDB();
-            const user = users.find(u => u.id === userId);
-            if (user) {
-                user.position = newPosition;
-                saveUsersDB(users);
-            }
-        }
-
-        function updateUserRole(userId, newRole) {
-            let users = getUsersDB();
-            const user = users.find(u => u.id === userId);
-            if (user) {
-                user.role = newRole;
-                saveUsersDB(users);
-                alert(`Peran ${user.name} diubah menjadi: ${newRole}`);
-            }
-        }
-
-        function updateUserDept(userId, newDept) {
-            let users = getUsersDB();
-            const user = users.find(u => u.id === userId);
-            if (user) {
-                user.dept = newDept;
-                saveUsersDB(users);
-            }
-        }
-
-        function deleteUser(userId) {
-            if (confirm('Hapus pengguna ini dari sistem?')) {
-                let users = getUsersDB();
-                users = users.filter(u => u.id !== userId);
-                saveUsersDB(users);
-                renderAdminUserTable();
-            }
-        }
-
-        function showDashboardView() {
-            activeDepartment = "";
-            document.getElementById('dashboardView').classList.remove('hidden');
-            document.getElementById('departmentDetailView').classList.add('hidden');
-        }
-
-        function openDepartmentView(dept) {
-            activeDepartment = dept;
-            activeFilterType = "ALL";
-            document.getElementById('deptDetailTitle').innerText = dept;
-            document.getElementById('dashboardView').classList.add('hidden');
-            document.getElementById('departmentDetailView').classList.remove('hidden');
-            updateFilterTabsUI();
-            renderDepartmentDetail();
-        }
-
-        function filterModuleType(type) {
-            activeFilterType = type;
-            updateFilterTabsUI();
-            renderDepartmentDetail();
-        }
-
-        function updateFilterTabsUI() {
-            const tabs = { ALL: document.getElementById('tabFilterAll'), SOP: document.getElementById('tabFilterSop'), VIDEO: document.getElementById('tabFilterVideo'), PDF: document.getElementById('tabFilterPdf') };
-            const activeClass = "py-3 px-5 border-b-2 border-indigo-600 font-bold text-indigo-600 text-sm whitespace-nowrap";
-            const inactiveClass = "py-3 px-5 border-b-2 border-transparent text-gray-500 hover:text-indigo-600 font-semibold text-sm whitespace-nowrap";
-            for (let key in tabs) {
-                if (tabs[key]) tabs[key].className = (key === activeFilterType) ? activeClass : inactiveClass;
-            }
-        }
-
-        function renderDepartmentDetail() {
-            const container = document.getElementById('modulesContainer');
-            const emptyState = document.getElementById('emptyModulesState');
-            container.innerHTML = '';
-
-            let customModules = JSON.parse(localStorage.getItem('solia_lms_custom_modules')) || [];
-            let allModules = [...defaultSopModules, ...customModules];
-
-            let deptModules = allModules.filter(m => m.dept === activeDepartment);
+            document.getElementById('otpDisplayHelper').innerText = `[SIMULASI GMAIL] Kode OTP Anda: ${generatedOtpCode}`;
             
-            let accessibleModules = deptModules.filter(m => {
-                if (m.permission === 'ALL') return true;
-                if (m.permission === 'INTERNAL') {
-                    if (!currentUser) return false;
-                    return currentUser.dept === activeDepartment || ['General Manager', 'Super Admin'].includes(currentUser.role);
-                }
-                return true;
-            });
+            document.getElementById('loginStep1').classList.add('hidden');
+            document.getElementById('loginStep2').classList.remove('hidden');
+        }
 
-            let filteredModules = accessibleModules.filter(m => {
-                if (activeFilterType === 'ALL') return true;
-                if (activeFilterType === 'SOP') return m.type === 'SOP';
-                if (activeFilterType === 'VIDEO') return m.videoUrl && m.videoUrl.trim() !== '';
-                if (activeFilterType === 'PDF') return m.type !== 'SOP';
-                return true;
-            });
+        function backToLoginStep1() {
+            document.getElementById('loginStep2').classList.add('hidden');
+            document.getElementById('loginStep1').classList.remove('hidden');
+        }
 
-            if (filteredModules.length === 0) {
-                emptyState.classList.remove('hidden');
+        function verifyOTP() {
+            const enteredOtp = document.getElementById('loginOtpInput').value.trim();
+            if (enteredOtp !== generatedOtpCode) {
+                alert("Kode OTP salah! Masukkan kode 6 angka yang tertera di kotak simulasi.");
                 return;
-            } else {
-                emptyState.classList.add('hidden');
             }
 
-            filteredModules.forEach(item => {
-                const card = document.createElement('div');
-                card.className = "bg-white rounded-xl shadow-sm border border-slate-200 p-5 flex flex-col justify-between hover:shadow-md transition";
-                const isSop = item.type === 'SOP';
+            const name = document.getElementById('loginName').value.trim();
+            const email = document.getElementById('loginEmail').value.trim();
+            const dept = document.getElementById('loginDept').value;
 
-                let typeBadge = isSop 
-                    ? '<span class="bg-red-50 text-red-600 text-[10px] font-bold px-2 py-0.5 rounded border border-red-200"><i class="fa-solid fa-file-contract mr-1"></i>SOP Utama</span>'
-                    : '<span class="bg-amber-50 text-amber-600 text-[10px] font-bold px-2 py-0.5 rounded border border-amber-200"><i class="fa-solid fa-file-pdf mr-1"></i>PDF / Slide Presentasi</span>';
+            let found = usersData.find(u => u.email.toLowerCase() === email.toLowerCase());
+            if (!found) {
+                found = { name, email, dept, role: "Staff" };
+                usersData.push(found);
+            }
+            currentUser = found;
 
-                let canDelete = currentUser && (['Super Admin', 'General Manager'].includes(currentUser.role) || (currentUser.role === 'Manager' && currentUser.dept === item.dept));
-                let deleteBtn = (!isSop && canDelete) 
-                    ? `<button onclick="deleteModule('${item.id}')" class="text-gray-400 hover:text-red-500 text-sm transition"><i class="fa-solid fa-trash"></i></button>`
-                    : '';
+            document.getElementById('headerUserName').innerText = currentUser.name;
+            document.getElementById('headerUserRole').innerText = `${currentUser.role} - ${currentUser.dept}`;
 
-                let quizCount = item.generatedQuestions ? item.generatedQuestions.length : 0;
+            if (currentUser.role === "Super Admin" || currentUser.role === "Manager") {
+                document.getElementById('nav-admin').classList.remove('hidden');
+            } else {
+                document.getElementById('nav-admin').classList.add('hidden');
+            }
 
-                card.innerHTML = `
+            document.getElementById('loginScreen').classList.add('hidden');
+            document.getElementById('mainApp').classList.remove('hidden');
+
+            switchTab('attendance');
+            renderDeptTabs();
+            renderModules();
+            updateRekapStats();
+        }
+
+        function logout() {
+            currentUser = null;
+            document.getElementById('mainApp').classList.add('hidden');
+            document.getElementById('loginScreen').classList.remove('hidden');
+            document.getElementById('loginOtpInput').value = '';
+            backToLoginStep1();
+        }
+
+        // --- NAVIGATION TABS ---
+        function switchTab(tabId) {
+            document.querySelectorAll('.tab-content').forEach(el => el.classList.add('hidden'));
+            document.querySelectorAll('.nav-btn').forEach(btn => {
+                btn.classList.remove('text-blue-700', 'bg-blue-50');
+                btn.classList.add('text-slate-600', 'hover:bg-slate-100');
+            });
+
+            document.getElementById(`tab-${tabId}`).classList.remove('hidden');
+            const activeBtn = document.getElementById(`nav-${tabId}`);
+            if (activeBtn) {
+                activeBtn.classList.remove('text-slate-600', 'hover:bg-slate-100');
+                activeBtn.classList.add('text-blue-700', 'bg-blue-50');
+            }
+
+            if (tabId === 'admin') {
+                renderAdminUserTable();
+                renderAdminModuleSelect();
+                renderAdminQuizEditor();
+            }
+        }
+
+        // --- ATTENDANCE LOGIC ---
+        function handleClockIn() {
+            const now = new Date();
+            const timeStr = now.toLocaleTimeString('id-ID', { timeZone: 'Asia/Makassar' });
+            const dateStr = now.toLocaleDateString('id-ID', { timeZone: 'Asia/Makassar' });
+
+            attendanceLogs.unshift({
+                date: dateStr,
+                clockIn: timeStr,
+                clockOut: "-",
+                durationMinutes: 0,
+                status: "Aktif Sesi"
+            });
+
+            document.getElementById('btnClockIn').classList.add('hidden');
+            document.getElementById('btnClockOut').classList.remove('hidden');
+            const badge = document.getElementById('attendanceStatusBadge');
+            badge.className = "inline-flex items-center px-3 py-1 rounded-full text-xs font-semibold bg-emerald-50 text-emerald-700";
+            badge.innerHTML = `<i class="fa-solid fa-circle text-[8px] mr-2 text-emerald-500 animate-pulse"></i> Sedang Bertugas (Clock In)`;
+
+            renderAttendanceTable();
+        }
+
+        function handleClockOut() {
+            const now = new Date();
+            const timeStr = now.toLocaleTimeString('id-ID', { timeZone: 'Asia/Makassar' });
+
+            if (attendanceLogs.length > 0 && attendanceLogs[0].clockOut === "-") {
+                attendanceLogs[0].clockOut = timeStr;
+                attendanceLogs[0].durationMinutes = 120;
+                attendanceLogs[0].status = "Selesai";
+            }
+
+            document.getElementById('btnClockOut').classList.add('hidden');
+            document.getElementById('btnClockIn').classList.remove('hidden');
+            const badge = document.getElementById('attendanceStatusBadge');
+            badge.className = "inline-flex items-center px-3 py-1 rounded-full text-xs font-semibold bg-slate-100 text-slate-600";
+            badge.innerHTML = `<i class="fa-solid fa-circle text-[8px] mr-2 text-slate-400"></i> Sesi Telah Berakhir`;
+
+            renderAttendanceTable();
+            updateRekapStats();
+        }
+
+        function renderAttendanceTable() {
+            const tbody = document.getElementById('attendanceTableBody');
+            if (attendanceLogs.length === 0) {
+                tbody.innerHTML = `<tr><td colspan="5" class="p-4 text-center text-slate-400">Belum ada riwayat absensi tercatat.</td></tr>`;
+                return;
+            }
+
+            tbody.innerHTML = attendanceLogs.map(log => `
+                <tr class="hover:bg-slate-50">
+                    <td class="p-3 font-medium text-slate-800">${log.date}</td>
+                    <td class="p-3 text-emerald-600 font-semibold">${log.clockIn}</td>
+                    <td class="p-3 text-rose-600 font-semibold">${log.clockOut}</td>
+                    <td class="p-3">${log.durationMinutes} Menit</td>
+                    <td class="p-3"><span class="px-2 py-0.5 rounded text-[10px] font-semibold ${log.status === 'Selesai' ? 'bg-emerald-50 text-emerald-700' : 'bg-blue-50 text-blue-700'}">${log.status}</span></td>
+                </tr>
+            `).join('');
+        }
+
+        // --- TRAINING MATERIAL & MODAL VIEWER ---
+        let selectedDeptFilter = "All";
+
+        function renderDeptTabs() {
+            const container = document.getElementById('deptTabsContainer');
+            let html = `<button onclick="filterDept('All')" class="dept-tab-btn px-4 py-2 rounded-lg text-xs font-semibold whitespace-nowrap transition bg-blue-600 text-white shadow-sm">Semua Departemen</button>`;
+            
+            departments.forEach(dept => {
+                html += `<button onclick="filterDept('${dept}')" class="dept-tab-btn px-4 py-2 rounded-lg text-xs font-semibold whitespace-nowrap transition bg-white text-slate-600 border border-slate-200 hover:bg-slate-50">${dept}</button>`;
+            });
+            container.innerHTML = html;
+        }
+
+        function filterDept(deptName) {
+            selectedDeptFilter = deptName;
+            document.querySelectorAll('.dept-tab-btn').forEach(btn => {
+                if (btn.innerText.includes(deptName) || (deptName === 'All' && btn.innerText.includes('Semua'))) {
+                    btn.className = "dept-tab-btn px-4 py-2 rounded-lg text-xs font-semibold whitespace-nowrap transition bg-blue-600 text-white shadow-sm";
+                } else {
+                    btn.className = "dept-tab-btn px-4 py-2 rounded-lg text-xs font-semibold whitespace-nowrap transition bg-white text-slate-600 border border-slate-200 hover:bg-slate-50";
+                }
+            });
+            renderModules();
+        }
+
+        function renderModules() {
+            const container = document.getElementById('moduleCardsContainer');
+            const typeFilter = document.getElementById('filterType').value;
+
+            let filtered = modulesData.filter(m => {
+                let matchDept = (selectedDeptFilter === 'All' || m.dept === selectedDeptFilter);
+                let matchType = (typeFilter === 'all' || m.type === typeFilter);
+                return matchDept && matchType;
+            });
+
+            if (filtered.length === 0) {
+                container.innerHTML = `<div class="col-span-3 text-center py-12 text-slate-400 text-xs">Tidak ada modul training ditemukan untuk kategori ini.</div>`;
+                return;
+            }
+
+            container.innerHTML = filtered.map(m => `
+                <div class="bg-white rounded-xl border border-slate-200 shadow-xs p-5 flex flex-col justify-between hover:shadow-md transition">
                     <div>
-                        <div class="flex justify-between items-start mb-3">
-                            ${typeBadge}
-                            ${deleteBtn}
+                        <div class="flex items-center justify-between mb-2">
+                            <span class="text-[10px] font-bold px-2.5 py-0.5 rounded bg-blue-50 text-blue-700 uppercase">${m.dept}</span>
+                            <span class="text-[10px] font-semibold px-2 py-0.5 rounded bg-slate-100 text-slate-600"><i class="fa-solid fa-clock mr-1"></i>${m.duration}</span>
                         </div>
-                        <h4 class="font-bold text-gray-800 text-base mb-2">${item.title}</h4>
-                        <div class="text-[11px] text-gray-500 mb-4"><i class="fa-solid fa-clipboard-question text-indigo-500 mr-1"></i>${quizCount} Soal Kuis Tersedia</div>
+                        <h3 class="font-bold text-slate-900 text-sm mb-1">${m.title}</h3>
+                        <p class="text-xs text-slate-500 line-clamp-2">${m.desc}</p>
                     </div>
-                    
-                    <button onclick="openModalForModule('${item.id}')" class="w-full bg-indigo-50 text-indigo-600 hover:bg-indigo-600 hover:text-white font-semibold py-2 rounded-lg text-sm transition flex justify-center items-center">
-                        <i class="fa-solid fa-book-open mr-2"></i> Pelajari Modul
-                    </button>
+                    <div class="mt-6 pt-4 border-t border-slate-100 flex items-center justify-between">
+                        <span class="text-xs font-semibold text-slate-400"><i class="fa-solid fa-file-shield mr-1"></i>${m.type}</span>
+                        <button onclick="openModuleModal('${m.id}')" class="bg-blue-600 hover:bg-blue-700 text-white px-3.5 py-1.5 rounded-lg text-xs font-medium transition shadow-xs">
+                            Pelajari <i class="fa-solid fa-arrow-right ml-1"></i>
+                        </button>
+                    </div>
+                </div>
+            `).join('');
+        }
+
+        function openModuleModal(modId) {
+            currentActiveModule = modulesData.find(m => m.id === modId);
+            if (!currentActiveModule) return;
+
+            document.getElementById('modalDeptTag').innerText = currentActiveModule.dept;
+            document.getElementById('modalModuleTitle').innerText = currentActiveModule.title;
+
+            const contentBox = document.getElementById('modalContentContainer');
+            if (currentActiveModule.type === 'Video') {
+                contentBox.innerHTML = `
+                    <video controls class="w-full h-64 rounded-lg shadow-sm bg-black">
+                        <source src="${currentActiveModule.contentUrl}" type="video/mp4">
+                        Browser Anda tidak mendukung tag video.
+                    </video>
                 `;
-                container.appendChild(card);
-            });
-        }
-
-        function deleteModule(id) {
-            if (confirm('Apakah Anda yakin ingin menghapus modul ini?')) {
-                let customModules = JSON.parse(localStorage.getItem('solia_lms_custom_modules')) || [];
-                customModules = customModules.filter(m => m.id.toString() !== id.toString());
-                localStorage.setItem('solia_lms_custom_modules', JSON.stringify(customModules));
-                renderDepartmentDetail();
+            } else {
+                contentBox.innerHTML = `
+                    <div class="w-full text-center space-y-3">
+                        <div class="text-xs font-semibold text-slate-600"><i class="fa-solid fa-file-pdf text-rose-600 mr-1 text-base"></i> Dokumen SOP Pelatihan Solia Legian Bali</div>
+                        <iframe src="${currentActiveModule.contentUrl}" class="w-full h-80 rounded-lg border border-slate-300 bg-white"></iframe>
+                    </div>
+                `;
             }
-        }
 
-        // --- AUTOMATIC STUDY TIMER ---
-        function startStudyTimer() {
-            activeStudyDurationSeconds = 0;
-            document.getElementById('liveStudyTimer').innerText = "00:00";
-            studyStartTime = new Date();
+            const quizBox = document.getElementById('quizQuestionsContainer');
+            quizBox.innerHTML = currentActiveModule.questions.map((q, idx) => `
+                <div class="space-y-2">
+                    <p class="text-xs font-bold text-slate-800">${idx + 1}. ${q.q}</p>
+                    <div class="space-y-1 pl-2">
+                        ${q.options.map((opt, oIdx) => `
+                            <label class="flex items-center space-x-2 text-xs text-slate-600 cursor-pointer">
+                                <input type="radio" name="quiz_q_${idx}" value="${oIdx}" class="text-blue-600 focus:ring-blue-500">
+                                <span>${opt}</span>
+                            </label>
+                        `).join('')}
+                    </div>
+                </div>
+            `).join('');
 
+            studySecondsCount = 0;
             if (studyTimerInterval) clearInterval(studyTimerInterval);
-
             studyTimerInterval = setInterval(() => {
-                activeStudyDurationSeconds++;
-                const mins = Math.floor(activeStudyDurationSeconds / 60).toString().padStart(2, '0');
-                const secs = (activeStudyDurationSeconds % 60).toString().padStart(2, '0');
-                document.getElementById('liveStudyTimer').innerText = `${mins}:${secs}`;
+                studySecondsCount++;
+                let mins = Math.floor(studySecondsCount / 60);
+                let secs = studySecondsCount % 60;
+                document.getElementById('studyTimerDisplay').innerText = `${String(mins).padStart(2, '0')}:${String(secs).padStart(2, '0')}`;
             }, 1000);
+
+            document.getElementById('moduleModal').classList.remove('hidden');
         }
 
-        function stopStudyTimerAndSaveLog(quizStatus = "Membaca Modul") {
-            if (studyTimerInterval) {
-                clearInterval(studyTimerInterval);
-                studyTimerInterval = null;
-            }
-
-            if (!currentActiveModule || activeStudyDurationSeconds <= 0) return;
-
-            const durationMinutes = (activeStudyDurationSeconds / 60).toFixed(1);
-            const user = currentUser || { name: 'Tamu / Staf', dept: activeDepartment || 'Umum' };
-
-            const newLog = {
-                id: 'log-' + Date.now(),
-                dateTime: new Date().toLocaleString('id-ID'),
-                userName: user.name,
-                userDept: user.dept,
-                moduleTitle: currentActiveModule.title,
-                durationSeconds: activeStudyDurationSeconds,
-                durationDisplay: `${durationMinutes} Mnt`,
-                status: quizStatus
-            };
-
-            let logs = getStudyLogs();
-            logs.unshift(newLog);
-            saveStudyLogs(logs);
-
-            activeStudyDurationSeconds = 0;
-            updateDashboardStats();
+        function closeModuleModal() {
+            if (studyTimerInterval) clearInterval(studyTimerInterval);
+            document.getElementById('moduleModal').classList.add('hidden');
         }
 
-        function updateDashboardStats() {
-            const logs = getStudyLogs();
-            const userLogs = currentUser ? logs.filter(l => l.userName === currentUser.name) : logs;
-
-            let totalSecs = userLogs.reduce((acc, curr) => acc + (curr.durationSeconds || 0), 0);
-            let totalHours = (totalSecs / 3600).toFixed(1);
-
-            let passedModules = new Set(userLogs.filter(l => l.status && l.status.includes('Lulus')).map(l => l.moduleTitle));
-
-            document.getElementById('statTotalHours').innerText = `${totalHours} / 10 Jam`;
-            document.getElementById('displayReminderHours').innerText = `${totalHours} Jam`;
-            document.getElementById('statCompletedModules').innerText = `${passedModules.size} Modul`;
-            document.getElementById('statCertificates').innerText = `${passedModules.size >= 3 ? 1 : 0} Sertifikat`;
-        }
-
-        function renderLogTable() {
-            const tbody = document.getElementById('logTableBody');
-            tbody.innerHTML = '';
-            const logs = getStudyLogs();
-
-            if (logs.length === 0) {
-                tbody.innerHTML = `<tr><td colspan="6" class="p-4 text-center text-gray-400">Belum ada riwayat aktivitas pembelajaran.</td></tr>`;
-                return;
-            }
-
-            logs.forEach(l => {
-                const tr = document.createElement('tr');
-                tr.className = "hover:bg-slate-50 border-b";
-
-                let statusBadge = `<span class="px-2 py-0.5 bg-blue-100 text-blue-700 rounded-full text-[10px] font-bold">${l.status}</span>`;
-                if (l.status && l.status.includes('Lulus')) {
-                    statusBadge = `<span class="px-2 py-0.5 bg-green-100 text-green-700 rounded-full text-[10px] font-bold">${l.status}</span>`;
-                } else if (l.status && l.status.includes('Gagal')) {
-                    statusBadge = `<span class="px-2 py-0.5 bg-red-100 text-red-700 rounded-full text-[10px] font-bold">${l.status}</span>`;
-                }
-
-                tr.innerHTML = `
-                    <td class="p-3">${l.dateTime}</td>
-                    <td class="p-3 font-semibold">${l.userName}</td>
-                    <td class="p-3">${l.userDept}</td>
-                    <td class="p-3">${l.moduleTitle}</td>
-                    <td class="p-3 font-mono font-bold text-amber-700">${l.durationDisplay}</td>
-                    <td class="p-3">${statusBadge}</td>
-                `;
-                tbody.appendChild(tr);
-            });
-        }
-
-        function renderPage(num) {
-            pageRendering = true;
-            pdfDoc.getPage(num).then(function(page) {
-                const viewport = page.getViewport({scale: scale});
-                canvas.height = viewport.height;
-                canvas.width = viewport.width;
-
-                const renderContext = { canvasContext: ctx, viewport: viewport };
-                const renderTask = page.render(renderContext);
-
-                renderTask.promise.then(function() {
-                    pageRendering = false;
-                    if (pageNumPending !== null) {
-                        renderPage(pageNumPending);
-                        pageNumPending = null;
-                    }
-                });
-            });
-            document.getElementById('pdfPageNum').textContent = num;
-        }
-
-        function queueRenderPage(num) {
-            if (pageRendering) pageNumPending = num;
-            else renderPage(num);
-        }
-
-        function prevPDFPage() {
-            if (pageNum <= 1) return;
-            pageNum--;
-            queueRenderPage(pageNum);
-        }
-
-        function nextPDFPage() {
-            if (!pdfDoc || pageNum >= pdfDoc.numPages) return;
-            pageNum++;
-            queueRenderPage(pageNum);
-        }
-
-        function loadPDFDocument(urlData) {
-            pdfjsLib.getDocument(urlData).promise.then(function(pdfDoc_) {
-                pdfDoc = pdfDoc_;
-                document.getElementById('pdfPageCount').textContent = pdfDoc.numPages;
-                pageNum = 1;
-                renderPage(pageNum);
-            }).catch(err => {
-                console.error("Gagal memuat PDF: ", err);
-            });
-        }
-
-        function openModalForModule(id) {
-            let customModules = JSON.parse(localStorage.getItem('solia_lms_custom_modules')) || [];
-            let allModules = [...defaultSopModules, ...customModules];
-            let item = allModules.find(m => m.id.toString() === id.toString());
-
-            if (!item) return;
-            currentActiveModule = item;
-
-            document.getElementById('modalDept').innerText = item.dept;
-            document.getElementById('modalTitle').innerText = item.title;
-
-            if (item.slideUrl) loadPDFDocument(item.slideUrl);
-
-            if (item.type === 'SOP' || !item.videoUrl || item.videoUrl.trim() === '') {
-                document.getElementById('videoIframe').src = "";
-                document.getElementById('modalTabsNav').classList.add('hidden');
-                document.getElementById('slideContainer').classList.remove('hidden');
-                document.getElementById('videoContainer').classList.add('hidden');
-            } else {
-                document.getElementById('videoIframe').src = item.videoUrl;
-                document.getElementById('modalTabsNav').classList.remove('hidden');
-                switchMediaTab('video');
-            }
-
-            document.getElementById('courseModal').classList.remove('hidden');
-            startStudyTimer();
-        }
-
-        function toggleFullscreenModal() {
-            const modalContent = document.getElementById('courseModalContent');
-            const icon = document.getElementById('fullscreenIcon');
-            const slideContainer = document.getElementById('slideContainer');
-
-            if (!isFullscreen) {
-                modalContent.classList.remove('max-w-4xl', 'max-h-[90vh]', 'rounded-xl');
-                modalContent.classList.add('w-full', 'h-full', 'max-w-none', 'max-h-none', 'rounded-none');
-                slideContainer.classList.remove('h-[60vh]');
-                slideContainer.classList.add('h-[80vh]');
-                icon.classList.remove('fa-expand');
-                icon.classList.add('fa-compress');
-                isFullscreen = true;
-            } else {
-                modalContent.classList.add('max-w-4xl', 'max-h-[90vh]', 'rounded-xl');
-                modalContent.classList.remove('w-full', 'h-full', 'max-w-none', 'max-h-none', 'rounded-none');
-                slideContainer.classList.add('h-[60vh]');
-                slideContainer.classList.remove('h-[80vh]');
-                icon.classList.remove('fa-compress');
-                icon.classList.add('fa-expand');
-                isFullscreen = false;
-            }
-        }
-
-        function closeModal() {
-            stopStudyTimerAndSaveLog("Membaca Modul");
-            document.getElementById('videoIframe').src = "";
-            document.getElementById('courseModal').classList.add('hidden');
-            if (isFullscreen) toggleFullscreenModal();
-        }
-
-        function switchMediaTab(type) {
-            if (type === 'video') {
-                document.getElementById('videoContainer').classList.remove('hidden');
-                document.getElementById('slideContainer').classList.add('hidden');
-                document.getElementById('tabVideoBtn').className = "py-2 px-4 border-b-2 border-indigo-600 font-semibold text-indigo-600 text-sm";
-                document.getElementById('tabSlideBtn').className = "py-2 px-4 border-b-2 border-transparent text-gray-500 hover:text-indigo-600 font-semibold text-sm";
-            } else {
-                document.getElementById('slideContainer').classList.remove('hidden');
-                document.getElementById('videoContainer').classList.add('hidden');
-                document.getElementById('tabSlideBtn').className = "py-2 px-4 border-b-2 border-indigo-600 font-semibold text-indigo-600 text-sm";
-                document.getElementById('tabVideoBtn').className = "py-2 px-4 border-b-2 border-transparent text-gray-500 hover:text-indigo-600 font-semibold text-sm";
-            }
-        }
-
-        // --- MODULE QUIZ SYSTEM ---
-        function startModuleQuiz() {
+        function submitQuiz() {
             if (!currentActiveModule) return;
-
-            document.getElementById('quizModalTitle').innerText = `Kuis: ${currentActiveModule.title}`;
-            document.getElementById('quizForm').classList.remove('hidden');
-            document.getElementById('quizResultBox').classList.add('hidden');
-
-            const container = document.getElementById('quizQuestionsContainer');
-            container.innerHTML = '';
-
-            let questions = currentActiveModule.generatedQuestions || [];
-
-            if (questions.length === 0) {
-                alert('Modul ini belum memiliki kuis.');
-                return;
-            }
-
-            questions.forEach((q, qIndex) => {
-                const qBox = document.createElement('div');
-                qBox.className = "bg-slate-50 border border-slate-200 p-4 rounded-lg";
-
-                let optionsHtml = q.options.map((opt, optIndex) => `
-                    <label class="flex items-start space-x-2.5 p-2 bg-white rounded border border-gray-200 hover:bg-indigo-50/50 cursor-pointer text-xs font-medium text-gray-700 transition">
-                        <input type="radio" name="q_${qIndex}" value="${optIndex}" required class="mt-0.5 text-indigo-600 focus:ring-indigo-500">
-                        <span>${opt}</span>
-                    </label>
-                `).join('');
-
-                qBox.innerHTML = `
-                    <p class="text-sm font-bold text-gray-800 mb-3">${qIndex + 1}. ${q.question}</p>
-                    <div class="space-y-2">${optionsHtml}</div>
-                `;
-                container.appendChild(qBox);
-            });
-
-            document.getElementById('quizModal').classList.remove('hidden');
-        }
-
-        function closeQuizModal() {
-            document.getElementById('quizModal').classList.add('hidden');
-        }
-
-        function submitQuiz(e) {
-            e.preventDefault();
-            if (!currentActiveModule) return;
-
-            let questions = currentActiveModule.generatedQuestions || [];
-            if (questions.length === 0) return;
 
             let correctCount = 0;
-            questions.forEach((q, qIndex) => {
-                const selectedOption = document.querySelector(`input[name="q_${qIndex}"]:checked`);
-                if (selectedOption && parseInt(selectedOption.value) === q.answer) {
+            currentActiveModule.questions.forEach((q, idx) => {
+                const selected = document.querySelector(`input[name="quiz_q_${idx}"]:checked`);
+                if (selected && parseInt(selected.value) === q.answer) {
                     correctCount++;
                 }
             });
 
-            const score = Math.round((correctCount / questions.length) * 100);
+            let score = Math.round((correctCount / currentActiveModule.questions.length) * 100);
+            let status = score >= 70 ? "Lulus" : "Gagal";
 
-            document.getElementById('quizForm').classList.add('hidden');
-            document.getElementById('quizResultBox').classList.remove('hidden');
+            alert(`Kuis Selesai! Skor Anda: ${score} (${status})`);
 
-            const scoreBadge = document.getElementById('quizScoreBadge');
-            scoreBadge.innerText = score;
+            trainingLogs.unshift({
+                title: currentActiveModule.title,
+                dept: currentActiveModule.dept,
+                time: new Date().toLocaleDateString('id-ID'),
+                duration: `${Math.ceil(studySecondsCount / 60)} Menit`,
+                durationMinVal: Math.ceil(studySecondsCount / 60),
+                score: score,
+                status: status
+            });
 
-            const btnProceed = document.getElementById('btnProceedEval');
-            const btnRetry = document.getElementById('btnRetryQuiz');
+            updateRekapStats();
+            closeModuleModal();
+        }
 
-            if (score >= 70) {
-                scoreBadge.className = "w-20 h-20 rounded-full bg-green-100 text-green-600 flex items-center justify-center text-3xl font-extrabold mx-auto mb-3 shadow-inner border-2 border-green-300";
-                document.getElementById('quizResultTitle').innerText = "Selamat! Anda Lulus Kuis";
-                document.getElementById('quizResultDesc').innerText = `Anda menjawab ${correctCount} dari ${questions.length} pertanyaan secara tepat. Silakan isi evaluasi training.`;
-                btnProceed.classList.remove('hidden');
-                btnRetry.classList.add('hidden');
+        function submitEvaluation() {
+            alert("Terima kasih! Umpan balik evaluasi training Anda berhasil dikirim ke sistem HRD Solia Legian Bali.");
+        }
 
-                stopStudyTimerAndSaveLog(`Lulus Kuis (Nilai: ${score})`);
+        // --- REKAP & STATS ---
+        function updateRekapStats() {
+            let totalMins = trainingLogs.reduce((acc, cur) => acc + cur.durationMinVal, 0);
+            let hours = Math.floor(totalMins / 60);
+            let mins = totalMins % 60;
+            document.getElementById('statTotalHours').innerText = `${hours} Jam ${mins} Min`;
+
+            let completedCount = trainingLogs.filter(l => l.status === 'Lulus').length;
+            document.getElementById('statCompletedModules').innerText = `${completedCount} Modul`;
+
+            let targetMinutes = 600;
+            let percentage = Math.min(100, Math.round((totalMins / targetMinutes) * 100));
+            document.getElementById('statPercentage').innerText = `${percentage}%`;
+
+            const tbody = document.getElementById('rekapTableBody');
+            if (trainingLogs.length === 0) {
+                tbody.innerHTML = `<tr><td colspan="6" class="p-4 text-center text-slate-400">Belum ada aktivitas training tercatat.</td></tr>`;
+                return;
+            }
+
+            tbody.innerHTML = trainingLogs.map(log => `
+                <tr class="hover:bg-slate-50">
+                    <td class="p-3 font-medium text-slate-800">${log.title}</td>
+                    <td class="p-3"><span class="px-2 py-0.5 rounded text-[10px] font-semibold bg-blue-50 text-blue-700">${log.dept}</span></td>
+                    <td class="p-3 text-slate-500">${log.time}</td>
+                    <td class="p-3">${log.duration}</td>
+                    <td class="p-3 font-bold text-slate-800">${log.score}</td>
+                    <td class="p-3"><span class="px-2 py-0.5 rounded text-[10px] font-semibold ${log.status === 'Lulus' ? 'bg-emerald-50 text-emerald-700' : 'bg-rose-50 text-rose-700'}">${log.status}</span></td>
+                </tr>
+            `).join('');
+        }
+
+        // --- SUPER ADMIN PANEL ---
+        function renderAdminUserTable() {
+            const tbody = document.getElementById('adminUserTableBody');
+            tbody.innerHTML = usersData.map(u => `
+                <tr class="hover:bg-slate-50">
+                    <td class="p-3 font-medium text-slate-800">${u.name}</td>
+                    <td class="p-3 text-slate-500">${u.email}</td>
+                    <td class="p-3"><span class="px-2 py-0.5 rounded text-[10px] font-semibold bg-blue-50 text-blue-700">${u.dept}</span></td>
+                    <td class="p-3"><span class="px-2 py-0.5 rounded text-[10px] font-semibold bg-slate-100 text-slate-700">${u.role}</span></td>
+                    <td class="p-3 text-right space-x-2">
+                        <button onclick="editUser('${u.email}')" class="text-blue-600 hover:text-blue-800 font-medium"><i class="fa-solid fa-pen-to-square"></i></button>
+                        <button onclick="deleteUser('${u.email}')" class="text-rose-600 hover:text-rose-800 font-medium"><i class="fa-solid fa-trash"></i></button>
+                    </td>
+                </tr>
+            `).join('');
+        }
+
+        function openAddUserModal() {
+            document.getElementById('userModalTitle').innerText = "Tambah Akun Staff Baru";
+            document.getElementById('editUserEmailOriginal').value = "";
+            document.getElementById('adminModalName').value = "";
+            document.getElementById('adminModalEmail').value = "";
+            document.getElementById('adminModalDept').value = "Front Office";
+            document.getElementById('adminModalRole').value = "Staff";
+            document.getElementById('userModal').classList.remove('hidden');
+        }
+
+        function editUser(email) {
+            let u = usersData.find(x => x.email === email);
+            if (!u) return;
+            document.getElementById('userModalTitle').innerText = "Edit Akun Staff";
+            document.getElementById('editUserEmailOriginal').value = u.email;
+            document.getElementById('adminModalName').value = u.name;
+            document.getElementById('adminModalEmail').value = u.email;
+            document.getElementById('adminModalDept').value = u.dept;
+            document.getElementById('adminModalRole').value = u.role;
+            document.getElementById('userModal').classList.remove('hidden');
+        }
+
+        function closeUserModal() {
+            document.getElementById('userModal').classList.add('hidden');
+        }
+
+        function saveUserModal() {
+            const origEmail = document.getElementById('editUserEmailOriginal').value;
+            const name = document.getElementById('adminModalName').value.trim();
+            const email = document.getElementById('adminModalEmail').value.trim();
+            const dept = document.getElementById('adminModalDept').value;
+            const role = document.getElementById('adminModalRole').value;
+
+            if (!name || !email) {
+                alert("Nama dan Email wajib diisi!");
+                return;
+            }
+
+            if (origEmail) {
+                let u = usersData.find(x => x.email === origEmail);
+                if (u) {
+                    u.name = name;
+                    u.email = email;
+                    u.dept = dept;
+                    u.role = role;
+                }
             } else {
-                scoreBadge.className = "w-20 h-20 rounded-full bg-red-100 text-red-600 flex items-center justify-center text-3xl font-extrabold mx-auto mb-3 shadow-inner border-2 border-red-300";
-                document.getElementById('quizResultTitle').innerText = "Belum Lulus Kuis";
-                document.getElementById('quizResultDesc').innerText = `Skor Anda ${score}. Silakan pelajari kembali modul ini dan ulangi kuis.`;
-                btnProceed.classList.add('hidden');
-                btnRetry.classList.remove('hidden');
+                usersData.push({ name, email, dept, role });
+            }
 
-                stopStudyTimerAndSaveLog(`Gagal Kuis (Nilai: ${score})`);
+            closeUserModal();
+            renderAdminUserTable();
+        }
+
+        function deleteUser(email) {
+            if (confirm(`Hapus akun ${email} dari sistem?`)) {
+                usersData = usersData.filter(x => x.email !== email);
+                renderAdminUserTable();
             }
         }
 
-        // --- EVALUATION FORM (STAFF) ---
-        function proceedToEvaluation() {
-            closeQuizModal();
-            openEvaluationModal();
+        function renderAdminModuleSelect() {
+            const sel = document.getElementById('adminModuleSelect');
+            sel.innerHTML = modulesData.map(m => `<option value="${m.id}">${m.dept} - ${m.title}</option>`).join('');
         }
 
-        function openEvaluationModal() {
-            const container = document.getElementById('evalQuestionsContainer');
-            container.innerHTML = '';
-            const questions = getHrdQuestions();
+        function renderAdminQuizEditor() {
+            const modId = document.getElementById('adminModuleSelect').value;
+            const mod = modulesData.find(m => m.id === modId);
+            const container = document.getElementById('adminQuizEditorContainer');
+            if (!mod) return;
 
-            questions.forEach((qText, idx) => {
-                const div = document.createElement('div');
-                div.className = "bg-slate-50 p-3 rounded-lg border border-slate-200 text-xs";
-                div.innerHTML = `
-                    <p class="font-bold text-gray-800 mb-2">${idx + 1}. ${qText}</p>
-                    <div class="flex space-x-4">
-                        ${[1, 2, 3, 4, 5].map(val => `
-                            <label class="flex items-center space-x-1 cursor-pointer">
-                                <input type="radio" name="eval_q_${idx}" value="${val}" required class="text-indigo-600">
-                                <span>${val} ${val === 1 ? '(Sangat Kurang)' : val === 5 ? '(Sangat Baik)' : ''}</span>
-                            </label>
-                        `).join('')}
+            container.innerHTML = `
+                <div class="space-y-3">
+                    <div class="text-xs font-bold text-slate-700">Daftar Pertanyaan Kuis Modul Ini:</div>
+                    ${mod.questions.map((q, idx) => `
+                        <div class="bg-white p-3 rounded-lg border border-slate-200 text-xs space-y-1">
+                            <div class="font-bold text-slate-800">Soal ${idx + 1}: ${q.q}</div>
+                            <div class="text-slate-500">Kunci Jawaban: Pilihan ke-${q.answer + 1} (${q.options[q.answer]})</div>
+                        </div>
+                    `).join('')}
+                    <div class="text-[11px] text-blue-700 bg-blue-50 p-2 rounded border border-blue-200">
+                        <i class="fa-solid fa-circle-info mr-1"></i> Admin dapat memperbarui modul atau menambah bank soal kuis melalui pembaruan sistem database HRD.
                     </div>
-                `;
-                container.appendChild(div);
-            });
-
-            document.getElementById('evaluationModal').classList.remove('hidden');
-        }
-
-        function submitEvaluation(e) {
-            e.preventDefault();
-            alert('Terima kasih! Feedback & Evaluasi Training Anda berhasil disimpan.');
-            document.getElementById('evaluationModal').classList.add('hidden');
-            closeModal();
-        }
-
-        // --- MANAGE HRD EVALUATION QUESTIONS ---
-        function openHrdEvalModal() {
-            renderHrdEvalQuestions();
-            document.getElementById('hrdEvalModal').classList.remove('hidden');
-        }
-
-        function closeHrdEvalModal() {
-            document.getElementById('hrdEvalModal').classList.add('hidden');
-        }
-
-        function renderHrdEvalQuestions() {
-            const container = document.getElementById('hrdEvalQuestionsList');
-            container.innerHTML = '';
-            const questions = getHrdQuestions();
-
-            questions.forEach((qText, idx) => {
-                const div = document.createElement('div');
-                div.className = "flex items-center space-x-2";
-                div.innerHTML = `
-                    <span class="text-xs font-bold text-gray-500 w-6">${idx + 1}.</span>
-                    <input type="text" value="${qText}" class="hrd-eval-input flex-1 border border-gray-300 p-2 rounded text-xs focus:ring-1 focus:ring-indigo-500">
-                    <button onclick="removeHrdEvalQuestion(${idx})" class="text-red-500 hover:text-red-700 text-xs px-2"><i class="fa-solid fa-trash"></i></button>
-                `;
-                container.appendChild(div);
-            });
-        }
-
-        function addHrdEvalQuestionField() {
-            const container = document.getElementById('hrdEvalQuestionsList');
-            const count = container.children.length;
-            const div = document.createElement('div');
-            div.className = "flex items-center space-x-2";
-            div.innerHTML = `
-                <span class="text-xs font-bold text-gray-500 w-6">${count + 1}.</span>
-                <input type="text" placeholder="Ketik pertanyaan evaluasi baru..." class="hrd-eval-input flex-1 border border-gray-300 p-2 rounded text-xs focus:ring-1 focus:ring-indigo-500">
-                <button onclick="this.parentElement.remove()" class="text-red-500 hover:text-red-700 text-xs px-2"><i class="fa-solid fa-trash"></i></button>
-            `;
-            container.appendChild(div);
-        }
-
-        function removeHrdEvalQuestion(index) {
-            let questions = getHrdQuestions();
-            questions.splice(index, 1);
-            saveHrdQuestions(questions);
-            renderHrdEvalQuestions();
-        }
-
-        function saveHrdEvalQuestions() {
-            const inputs = document.querySelectorAll('.hrd-eval-input');
-            const newQuestions = [];
-            inputs.forEach(input => {
-                if (input.value.trim() !== '') {
-                    newQuestions.push(input.value.trim());
-                }
-            });
-            saveHrdQuestions(newQuestions);
-            closeHrdEvalModal();
-            alert('Pertanyaan evaluasi HRD berhasil diperbarui!');
-        }
-
-        // --- UPLOAD MODULE & MANUAL QUIZ BUILDER ---
-        function openUploadModal() {
-            document.getElementById('uploadModal').classList.remove('hidden');
-            document.getElementById('uploadForm').reset();
-            document.getElementById('manualQuestionsContainer').innerHTML = '';
-            addManualQuestionField();
-        }
-
-        function closeUploadModal() {
-            document.getElementById('uploadModal').classList.add('hidden');
-        }
-
-        function addManualQuestionField() {
-            const container = document.getElementById('manualQuestionsContainer');
-            const qCount = container.children.length;
-
-            const div = document.createElement('div');
-            div.className = "bg-slate-50 p-3 rounded-lg border border-slate-200 relative space-y-2 text-xs";
-            div.innerHTML = `
-                <div class="flex justify-between items-center">
-                    <span class="font-bold text-indigo-900">Pertanyaan ${qCount + 1}</span>
-                    ${qCount > 0 ? `<button type="button" onclick="this.parentElement.parentElement.remove()" class="text-red-500 hover:text-red-700"><i class="fa-solid fa-trash"></i></button>` : ''}
-                </div>
-                <input type="text" required placeholder="Tulis soal kuis..." class="q-text-input w-full border border-gray-300 p-2 rounded text-xs focus:ring-1 focus:ring-indigo-500">
-                
-                <div class="grid grid-cols-2 gap-2">
-                    <input type="text" required placeholder="Pilihan A" class="q-opt-0 border border-gray-300 p-1.5 rounded text-xs">
-                    <input type="text" required placeholder="Pilihan B" class="q-opt-1 border border-gray-300 p-1.5 rounded text-xs">
-                    <input type="text" required placeholder="Pilihan C" class="q-opt-2 border border-gray-300 p-1.5 rounded text-xs">
-                    <input type="text" required placeholder="Pilihan D" class="q-opt-3 border border-gray-300 p-1.5 rounded text-xs">
-                </div>
-
-                <div class="flex items-center space-x-2 pt-1">
-                    <label class="font-semibold text-gray-700">Kunci Jawaban Tepat:</label>
-                    <select class="q-correct-ans border border-gray-300 p-1 rounded bg-white text-xs font-bold text-indigo-700">
-                        <option value="0">Pilihan A</option>
-                        <option value="1">Pilihan B</option>
-                        <option value="2">Pilihan C</option>
-                        <option value="3">Pilihan D</option>
-                    </select>
                 </div>
             `;
-            container.appendChild(div);
         }
-
-        function handleFormSubmit(e) {
-            e.preventDefault();
-
-            const dept = document.getElementById('formDept').value;
-            const permission = document.getElementById('formPermission').value;
-            const title = document.getElementById('formTitle').value.trim();
-            const videoUrl = document.getElementById('formVideoUrl').value.trim();
-            const fileInput = document.getElementById('formLocalFile');
-
-            if (!fileInput.files || fileInput.files.length === 0) {
-                alert('Silakan pilih file PDF terlebih dahulu!');
-                return;
-            }
-
-            const questionBoxes = document.querySelectorAll('#manualQuestionsContainer > div');
-            const generatedQuestions = [];
-
-            questionBoxes.forEach(box => {
-                const qText = box.querySelector('.q-text-input').value.trim();
-                const optA = box.querySelector('.q-opt-0').value.trim();
-                const optB = box.querySelector('.q-opt-1').value.trim();
-                const optC = box.querySelector('.q-opt-2').value.trim();
-                const optD = box.querySelector('.q-opt-3').value.trim();
-                const correctAns = parseInt(box.querySelector('.q-correct-ans').value);
-
-                if (qText && optA && optB && optC && optD) {
-                    generatedQuestions.push({
-                        question: qText,
-                        options: [optA, optB, optC, optD],
-                        answer: correctAns
-                    });
-                }
-            });
-
-            if (generatedQuestions.length === 0) {
-                alert('Silakan isi minimal 1 pertanyaan kuis beserta pilihan jawabannya!');
-                return;
-            }
-
-            const file = fileInput.files[0];
-            const objectUrl = URL.createObjectURL(file);
-
-            const newModule = {
-                id: 'mod-' + Date.now(),
-                dept: dept,
-                title: title,
-                type: 'PDF',
-                permission: permission,
-                slideUrl: objectUrl,
-                videoUrl: videoUrl,
-                generatedQuestions: generatedQuestions
-            };
-
-            let customModules = JSON.parse(localStorage.getItem('solia_lms_custom_modules')) || [];
-            customModules.push(newModule);
-            localStorage.setItem('solia_lms_custom_modules', JSON.stringify(customModules));
-
-            alert('Modul baru dan kuis berhasil di-publish!');
-            closeUploadModal();
-            if (activeDepartment === dept) {
-                renderDepartmentDetail();
-            }
-        }
-
-        // --- INITIALIZE SYSTEM ON LOAD ---
-        window.onload = function() {
-            getUsersDB();
-            updateDashboardStats();
-        };
     </script>
 </body>
 </html>
