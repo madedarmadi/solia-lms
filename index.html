@@ -15,68 +15,151 @@
         .custom-scrollbar::-webkit-scrollbar-track { background: #f1f5f9; }
         .custom-scrollbar::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 4px; }
         .custom-scrollbar::-webkit-scrollbar-thumb:hover { background: #94a3b8; }
+        @media print {
+            body * { visibility: hidden; }
+            #printableCertificate, #printableCertificate * { visibility: visible; }
+            #printableCertificate { position: absolute; left: 0; top: 0; width: 100%; }
+        }
     </style>
 </head>
 <body class="bg-slate-50 text-slate-800 font-sans antialiased min-h-screen flex flex-col">
 
-    <!-- LOGIN SCREEN -->
+    <!-- LOGIN SCREEN (MENU PILIHAN: REGISTRASI & LOGIN & LUPA PASSWORD) -->
     <div id="loginScreen" class="fixed inset-0 bg-slate-900 z-50 flex items-center justify-center p-4">
         <div class="bg-white rounded-2xl shadow-2xl max-w-md w-full p-8 overflow-hidden relative">
             <div class="absolute top-0 left-0 right-0 h-2 bg-gradient-to-r from-blue-600 to-indigo-700"></div>
             
-            <div class="text-center mb-8">
-                <div class="inline-flex items-center justify-center w-16 h-16 rounded-full bg-blue-50 text-blue-700 text-2xl font-bold mb-4 border border-blue-200">
+            <div class="text-center mb-6">
+                <div class="inline-flex items-center justify-center w-16 h-16 rounded-full bg-blue-50 text-blue-700 text-2xl font-bold mb-3 border border-blue-200">
                     <i class="fa-solid fa-hotel"></i>
                 </div>
                 <h1 class="text-2xl font-bold text-slate-900">Solia Legian Bali</h1>
                 <p class="text-sm text-slate-500 mt-1">LMS & Staff Training Portal</p>
             </div>
 
-            <!-- Login Step 1: Form -->
-            <div id="loginStep1" class="space-y-4">
-                <div>
-                    <label class="block text-xs font-semibold uppercase tracking-wider text-slate-600 mb-1">Nama Lengkap</label>
-                    <input type="text" id="loginName" class="w-full px-4 py-3 rounded-lg border border-slate-300 focus:outline-none focus:ring-2 focus:ring-blue-600 text-sm" placeholder="Contoh: Budi Santoso">
-                </div>
-                <div>
-                    <label class="block text-xs font-semibold uppercase tracking-wider text-slate-600 mb-1">Email Hotel (@solialegian.com)</label>
-                    <input type="email" id="loginEmail" class="w-full px-4 py-3 rounded-lg border border-slate-300 focus:outline-none focus:ring-2 focus:ring-blue-600 text-sm" placeholder="budi.santoso@solialegian.com">
-                </div>
-                <div>
-                    <label class="block text-xs font-semibold uppercase tracking-wider text-slate-600 mb-1">Departemen</label>
-                    <select id="loginDept" class="w-full px-4 py-3 rounded-lg border border-slate-300 focus:outline-none focus:ring-2 focus:ring-blue-600 text-sm bg-white">
-                        <option value="Front Office">Front Office</option>
-                        <option value="Housekeeping">Housekeeping</option>
-                        <option value="F&B Service">F&B Service</option>
-                        <option value="F&B Product (Kitchen)">F&B Product (Kitchen)</option>
-                        <option value="Engineering">Engineering</option>
-                        <option value="Security & Safety">Security & Safety</option>
-                        <option value="Sales & Marketing">Sales & Marketing</option>
-                        <option value="Human Resources">Human Resources</option>
-                        <option value="Accounting & Finance">Accounting & Finance</option>
-                    </select>
-                </div>
-                <button onclick="requestOTP()" class="w-full bg-blue-600 hover:bg-blue-700 text-white font-medium py-3 rounded-lg transition shadow-md text-sm mt-2">
-                    Kirim Kode OTP (Simulasi Gmail)
+            <!-- TABS PILIHAN UTAMA: 1. LOGIN | 2. REGISTRASI -->
+            <div class="flex rounded-lg bg-slate-100 p-1 mb-6 text-xs font-semibold">
+                <button onclick="switchAuthTab('login')" id="authTabLogin" class="flex-1 py-2 rounded-md transition bg-white text-blue-700 shadow-xs">
+                    <i class="fa-solid fa-right-to-bracket mr-1"></i> Menu Login
+                </button>
+                <button onclick="switchAuthTab('register')" id="authTabRegister" class="flex-1 py-2 rounded-md transition text-slate-500 hover:text-slate-800">
+                    <i class="fa-solid fa-user-plus mr-1"></i> Menu Registrasi
                 </button>
             </div>
 
-            <!-- Login Step 2: OTP Verification -->
-            <div id="loginStep2" class="space-y-4 hidden">
-                <div class="bg-blue-50 border border-blue-200 rounded-lg p-4 text-xs text-blue-900 text-center">
-                    <i class="fa-solid fa-envelope-circle-check text-base mb-1 block"></i>
-                    Kode OTP simulasi telah dikirim ke Gmail Anda. <br>Masukkan kode <strong>6 angka</strong> di bawah ini.
-                    <div id="otpDisplayHelper" class="mt-2 font-mono font-bold text-blue-950 bg-blue-100 py-1 rounded"></div>
+            <!-- 1. FORM MENU LOGIN -->
+            <div id="authContainerLogin" class="space-y-4">
+                <div class="space-y-3">
+                    <div>
+                        <label class="block text-xs font-semibold uppercase tracking-wider text-slate-600 mb-1">Email Hotel Terdaftar</label>
+                        <input type="email" id="loginInputEmail" class="w-full px-4 py-3 rounded-lg border border-slate-300 focus:outline-none focus:ring-2 focus:ring-blue-600 text-sm" placeholder="budi.santoso@solialegian.com">
+                    </div>
+                    <div>
+                        <div class="flex items-center justify-between mb-1">
+                            <label class="block text-xs font-semibold uppercase tracking-wider text-slate-600">Password</label>
+                            <button type="button" onclick="openForgotPasswordModal()" class="text-xs text-blue-600 hover:underline font-semibold">Lupa Password?</button>
+                        </div>
+                        <div class="relative">
+                            <input type="password" id="loginInputPassword" class="w-full px-4 py-3 pr-10 rounded-lg border border-slate-300 focus:outline-none focus:ring-2 focus:ring-blue-600 text-sm" placeholder="Masukkan password Anda">
+                            <button type="button" onclick="togglePasswordVisibility('loginInputPassword', 'toggleLoginPasswordIcon')" class="absolute inset-y-0 right-0 pr-3 flex items-center text-slate-400 hover:text-slate-600">
+                                <i id="toggleLoginPasswordIcon" class="fa-solid fa-eye text-sm"></i>
+                            </button>
+                        </div>
+                    </div>
+                    <button onclick="processLoginRequest()" class="w-full bg-blue-600 hover:bg-blue-700 text-white font-medium py-3 rounded-lg transition shadow-md text-sm">
+                        Login
+                    </button>
+                </div>
+            </div>
+
+            <!-- 2. FORM MENU REGISTRASI -->
+            <div id="authContainerRegister" class="space-y-4 hidden">
+                <div id="regStep1" class="space-y-3">
+                    <div>
+                        <label class="block text-xs font-semibold uppercase tracking-wider text-slate-600 mb-1">Nama Lengkap</label>
+                        <input type="text" id="regName" class="w-full px-3 py-2.5 rounded-lg border border-slate-300 focus:outline-none focus:ring-2 focus:ring-blue-600 text-sm" placeholder="Contoh: Budi Santoso">
+                    </div>
+                    <div>
+                        <label class="block text-xs font-semibold uppercase tracking-wider text-slate-600 mb-1">Email Hotel (@solialegian.com)</label>
+                        <input type="email" id="regEmail" class="w-full px-3 py-2.5 rounded-lg border border-slate-300 focus:outline-none focus:ring-2 focus:ring-blue-600 text-sm" placeholder="budi.santoso@solialegian.com">
+                    </div>
+                    <div>
+                        <label class="block text-xs font-semibold uppercase tracking-wider text-slate-600 mb-1">Password Baru</label>
+                        <div class="relative">
+                            <input type="password" id="regPassword" class="w-full px-3 py-2.5 pr-10 rounded-lg border border-slate-300 focus:outline-none focus:ring-2 focus:ring-blue-600 text-sm" placeholder="Buat password akun">
+                            <button type="button" onclick="togglePasswordVisibility('regPassword', 'toggleRegPasswordIcon')" class="absolute inset-y-0 right-0 pr-3 flex items-center text-slate-400 hover:text-slate-600">
+                                <i id="toggleRegPasswordIcon" class="fa-solid fa-eye text-sm"></i>
+                            </button>
+                        </div>
+                    </div>
+                    <div>
+                        <label class="block text-xs font-semibold uppercase tracking-wider text-slate-600 mb-1">Departemen</label>
+                        <select id="regDept" class="w-full px-3 py-2.5 rounded-lg border border-slate-300 focus:outline-none focus:ring-2 focus:ring-blue-600 text-sm bg-white">
+                            <option value="Front Office">Front Office</option>
+                            <option value="Housekeeping">Housekeeping</option>
+                            <option value="F&B Service">F&B Service</option>
+                            <option value="F&B Product (Kitchen)">F&B Product (Kitchen)</option>
+                            <option value="Engineering">Engineering</option>
+                            <option value="Security & Safety">Security & Safety</option>
+                            <option value="Sales & Marketing">Sales & Marketing</option>
+                            <option value="Human Resources">Human Resources</option>
+                            <option value="Accounting & Finance">Accounting & Finance</option>
+                        </select>
+                    </div>
+                    <div>
+                        <label class="block text-xs font-semibold uppercase tracking-wider text-slate-600 mb-1">Jabatan / Posisi</label>
+                        <input type="text" id="regPosition" class="w-full px-3 py-2.5 rounded-lg border border-slate-300 focus:outline-none focus:ring-2 focus:ring-blue-600 text-sm" placeholder="Contoh: Front Desk Agent">
+                    </div>
+                    <div>
+                        <label class="block text-xs font-semibold uppercase tracking-wider text-slate-600 mb-1">Akses / Role</label>
+                        <select id="regRole" disabled class="w-full px-3 py-2.5 rounded-lg border border-slate-300 text-sm bg-slate-100 text-slate-500">
+                            <option value="Staff">Staff (ditetapkan otomatis)</option>
+                        </select>
+                    </div>
+                    <button onclick="processRegisterDirect()" class="w-full bg-emerald-600 hover:bg-emerald-700 text-white font-medium py-3 rounded-lg transition shadow-md text-sm mt-1">
+                        Daftar Akun
+                    </button>
+                </div>
+            </div>
+
+        </div>
+    </div>
+
+    <!-- MODAL LUPA PASSWORD & VERIFIKASI OTP -->
+    <div id="forgotPasswordModal" class="fixed inset-0 bg-slate-900/80 z-50 flex items-center justify-center p-4 hidden">
+        <div class="bg-white rounded-2xl shadow-2xl max-w-md w-full p-6 space-y-5 relative">
+            <div class="flex items-center justify-between border-b pb-3">
+                <h3 class="text-base font-bold text-slate-900"><i class="fa-solid fa-key text-blue-600 mr-2"></i>Reset Password via OTP</h3>
+                <button onclick="closeForgotPasswordModal()" class="text-slate-400 hover:text-slate-600 text-lg"><i class="fa-solid fa-xmark"></i></button>
+            </div>
+
+            <!-- STEP 1: Masukkan Email -->
+            <div id="forgotStep1" class="space-y-4">
+                <p class="text-xs text-slate-500 leading-relaxed">Masukkan alamat email hotel yang terdaftar. Sistem akan mengirimkan kode OTP verifikasi dengan cepat ke email Anda.</p>
+                <div>
+                    <label class="block text-xs font-semibold uppercase tracking-wider text-slate-600 mb-1">Email Hotel</label>
+                    <input type="email" id="forgotInputEmail" class="w-full px-3 py-2.5 rounded-lg border border-slate-300 text-xs" placeholder="budi.santoso@solialegian.com">
+                </div>
+                <button onclick="sendOtpCode()" class="w-full bg-blue-600 hover:bg-blue-700 text-white font-medium py-2.5 rounded-lg text-xs transition shadow-sm">
+                    Kirim Kode OTP
+                </button>
+            </div>
+
+            <!-- STEP 2: Verifikasi OTP & Password Baru -->
+            <div id="forgotStep2" class="space-y-4 hidden">
+                <div class="bg-blue-50 border border-blue-200 p-3 rounded-lg text-xs text-blue-800">
+                    <i class="fa-solid fa-circle-info mr-1"></i> Kode OTP 6-digit telah dikirim ke <strong id="sentEmailDisplay"></strong>. (Simulasi: Cek notifikasi popup / alert di layar).
                 </div>
                 <div>
-                    <label class="block text-xs font-semibold uppercase tracking-wider text-slate-600 mb-1">Kode OTP Verifikasi</label>
-                    <input type="text" id="loginOtpInput" maxlength="6" class="w-full text-center tracking-widest text-xl font-bold px-4 py-3 rounded-lg border border-slate-300 focus:outline-none focus:ring-2 focus:ring-blue-600" placeholder="------">
+                    <label class="block text-xs font-semibold uppercase tracking-wider text-slate-600 mb-1">Masukkan Kode OTP (6 Digit)</label>
+                    <input type="text" id="forgotInputOtp" maxlength="6" class="w-full px-3 py-2.5 rounded-lg border border-slate-300 font-mono tracking-widest text-center text-sm font-bold" placeholder="123456">
                 </div>
-                <button onclick="verifyOTP()" class="w-full bg-blue-600 hover:bg-blue-700 text-white font-medium py-3 rounded-lg transition shadow-md text-sm">
-                    Verifikasi & Masuk Portal
-                </button>
-                <button onclick="backToLoginStep1()" class="w-full text-slate-500 hover:text-slate-700 text-xs text-center pt-2">
-                    <i class="fa-solid fa-arrow-left mr-1"></i> Kembali ke Form Utama
+                <div>
+                    <label class="block text-xs font-semibold uppercase tracking-wider text-slate-600 mb-1">Password Baru</label>
+                    <input type="password" id="forgotNewPassword" class="w-full px-3 py-2.5 rounded-lg border border-slate-300 text-xs" placeholder="Masukkan password baru">
+                </div>
+                <button onclick="verifyAndResetPassword()" class="w-full bg-emerald-600 hover:bg-emerald-700 text-white font-medium py-2.5 rounded-lg text-xs transition shadow-sm">
+                    Verifikasi & Simpan Password Baru
                 </button>
             </div>
         </div>
@@ -84,22 +167,23 @@
 
     <!-- MAIN APP WRAPPER -->
     <div id="mainApp" class="flex-1 flex flex-col hidden">
-        <!-- TOP NAVIGATION WITH RESPONSIVE HAMBURGER -->
+        <!-- TOP NAVIGATION -->
         <header class="bg-white shadow-md sticky top-0 z-50">
             <div class="max-w-7xl mx-auto px-4 py-3 flex justify-between items-center">
-                <!-- Logo / Judul Aplikasi -->
                 <div class="flex items-center space-x-3">
-                    <div class="w-9 h-9 rounded-lg bg-blue-600 text-white flex items-center justify-center font-bold text-sm shadow-sm">
+                    <div id="headerHotelLogo" class="w-9 h-9 rounded-lg bg-blue-600 text-white flex items-center justify-center font-bold text-sm shadow-sm overflow-hidden">
                         <i class="fa-solid fa-hotel"></i>
                     </div>
                     <div>
-                        <span class="font-bold text-base text-slate-900 block leading-tight">Solia Legian Bali</span>
-                        <span class="text-[10px] text-blue-700 font-medium">LMS & Training Academy</span>
+                        <span id="headerHotelName" class="font-bold text-base text-slate-900 block leading-tight">Solia Legian Bali</span>
+                        <span id="headerPortalSubtitle" class="text-[10px] text-blue-700 font-medium">LMS & Training Academy</span>
                     </div>
                 </div>
 
-                <!-- Menu Navigasi untuk Komputer (Desktop) -->
                 <nav class="hidden md:flex space-x-1">
+                    <button onclick="switchTab('dashboard')" id="nav-dashboard" class="nav-btn px-3 py-2 rounded-lg text-sm font-medium transition text-blue-700 bg-blue-50">
+                        <i class="fa-solid fa-house mr-1.5"></i> Dashboard
+                    </button>
                     <button onclick="switchTab('attendance')" id="nav-attendance" class="nav-btn px-3 py-2 rounded-lg text-sm font-medium transition text-blue-700 bg-blue-50">
                         <i class="fa-solid fa-clock-rotate-left mr-1.5"></i> Attendance
                     </button>
@@ -109,12 +193,18 @@
                     <button onclick="switchTab('rekap')" id="nav-rekap" class="nav-btn px-3 py-2 rounded-lg text-sm font-medium transition text-slate-600 hover:bg-gray-100">
                         <i class="fa-solid fa-chart-line mr-1.5"></i> Rekap & Evaluasi
                     </button>
-                    <button onclick="switchTab('admin')" id="nav-admin" class="nav-btn px-3 py-2 rounded-lg text-sm font-medium transition text-slate-600 hover:bg-gray-100 hidden">
-                        <i class="fa-solid fa-user-gear mr-1.5"></i> Super Admin
+                    <button onclick="switchTab('management')" id="nav-management" class="nav-btn px-3 py-2 rounded-lg text-sm font-medium transition text-slate-600 hover:bg-gray-100 hidden">
+                        <i class="fa-solid fa-users-viewfinder mr-1.5"></i> Monitoring Tim
+                    </button>
+                    <button onclick="switchTab('certificate')" id="nav-certificate" class="nav-btn px-3 py-2 rounded-lg text-sm font-medium transition text-slate-600 hover:bg-gray-100">
+                        <i class="fa-solid fa-award mr-1.5"></i> Sertifikat
+                    </button>
+                    <!-- Menu Tools Khusus Super Admin -->
+                    <button onclick="switchTab('tools')" id="nav-tools" class="nav-btn px-3 py-2 rounded-lg text-sm font-medium transition text-slate-600 hover:bg-gray-100 hidden">
+                        <i class="fa-solid fa-toolbox mr-1.5"></i> Tools
                     </button>
                 </nav>
 
-                <!-- Profile Info & Mobile Menu Button -->
                 <div class="flex items-center space-x-3">
                     <div class="text-right hidden sm:block">
                         <div id="headerUserName" class="text-xs font-bold text-slate-800">Nama Staff</div>
@@ -124,7 +214,6 @@
                         <i class="fa-solid fa-power-off text-sm"></i>
                     </div>
 
-                    <!-- Tombol Hamburger khusus Handphone (Mobile) -->
                     <div class="md:hidden flex items-center">
                         <button id="mobile-menu-button" onclick="toggleMobileMenu()" class="p-2 rounded-lg text-gray-600 hover:bg-gray-100 focus:outline-none">
                             <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
@@ -135,8 +224,11 @@
                 </div>
             </div>
 
-            <!-- Dropdown Menu Handphone (Muncul ketika tombol hamburger diklik) -->
+            <!-- Mobile Dropdown Menu -->
             <div id="mobile-menu" class="hidden md:hidden bg-white border-t border-gray-100 px-4 pt-2 pb-4 space-y-1 shadow-lg">
+                <button onclick="switchTab('dashboard'); toggleMobileMenu();" class="block w-full text-left px-3 py-2 rounded-lg text-sm font-medium text-gray-700 hover:bg-blue-50 hover:text-blue-600">
+                    <i class="fa-solid fa-house mr-2"></i> Dashboard
+                </button>
                 <button onclick="switchTab('attendance'); toggleMobileMenu();" class="block w-full text-left px-3 py-2 rounded-lg text-sm font-medium text-gray-700 hover:bg-blue-50 hover:text-blue-600">
                     <i class="fa-solid fa-clock-rotate-left mr-2"></i> Attendance
                 </button>
@@ -146,14 +238,128 @@
                 <button onclick="switchTab('rekap'); toggleMobileMenu();" class="block w-full text-left px-3 py-2 rounded-lg text-sm font-medium text-gray-700 hover:bg-blue-50 hover:text-blue-600">
                     <i class="fa-solid fa-chart-line mr-2"></i> Rekap & Evaluasi
                 </button>
-                <button onclick="switchTab('admin'); toggleMobileMenu();" id="mobile-nav-admin" class="block w-full text-left px-3 py-2 rounded-lg text-sm font-medium text-gray-700 hover:bg-blue-50 hover:text-blue-600 hidden">
-                    <i class="fa-solid fa-user-gear mr-2"></i> Super Admin
+                <button onclick="switchTab('management'); toggleMobileMenu();" id="mobile-nav-management" class="hidden w-full text-left px-3 py-2 rounded-lg text-sm font-medium text-gray-700 hover:bg-blue-50 hover:text-blue-600">
+                    <i class="fa-solid fa-users-viewfinder mr-2"></i> Monitoring Tim
+                </button>
+                <button onclick="switchTab('certificate'); toggleMobileMenu();" class="block w-full text-left px-3 py-2 rounded-lg text-sm font-medium text-gray-700 hover:bg-blue-50 hover:text-blue-600">
+                    <i class="fa-solid fa-award mr-2"></i> Sertifikat
+                </button>
+                <button onclick="switchTab('tools'); toggleMobileMenu();" id="mobile-nav-tools" class="hidden w-full text-left px-3 py-2 rounded-lg text-sm font-medium text-gray-700 hover:bg-blue-50 hover:text-blue-600">
+                    <i class="fa-solid fa-toolbox mr-2"></i> Tools
                 </button>
             </div>
         </header>
 
         <!-- CONTENT CONTAINER -->
         <main class="flex-1 max-w-7xl w-full mx-auto px-4 sm:px-6 lg:px-8 py-6">
+
+            <!-- TAB 0: DASHBOARD -->
+            <section id="tab-dashboard" class="tab-content space-y-6">
+                <div class="bg-white rounded-xl border border-slate-200 shadow-xs p-5 flex flex-col md:flex-row md:items-center gap-4">
+                    <div id="dashboardHotelLogo" class="w-16 h-16 rounded-xl bg-blue-50 text-blue-700 flex items-center justify-center text-2xl font-bold overflow-hidden shrink-0"><i class="fa-solid fa-hotel"></i></div>
+                    <div class="min-w-0">
+                        <p id="dashboardHotelName" class="text-xl font-bold text-slate-900 truncate">Solia Legian Bali</p>
+                        <p id="dashboardHotelDetail" class="text-xs text-slate-500 mt-1">Hotel Training & Development Center</p>
+                        <p id="dashboardHotelContact" class="text-[11px] text-slate-400 mt-1">Hubungi HRD untuk informasi training</p>
+                    </div>
+                    <div class="md:ml-auto text-left md:text-right shrink-0">
+                        <p class="text-[10px] uppercase tracking-wider font-semibold text-blue-600">Portal Pembelajaran</p>
+                        <p id="dashboardPortalSubtitle" class="text-sm font-semibold text-slate-700 mt-1">LMS & Training Academy</p>
+                    </div>
+                </div>
+                <div class="bg-gradient-to-r from-blue-700 to-indigo-800 rounded-xl p-6 text-white shadow-md">
+                    <div class="flex flex-col md:flex-row md:items-center justify-between gap-4">
+                        <div>
+                            <p class="text-xs uppercase tracking-widest text-blue-100 font-semibold">Training overview</p>
+                            <h2 id="dashboardGreeting" class="text-2xl font-bold mt-1">Selamat datang</h2>
+                            <p class="text-sm text-blue-100 mt-1">Pantau progres belajar dan lanjutkan modul Anda hari ini.</p>
+                        </div>
+                        <button onclick="switchTab('training')" class="bg-white text-blue-700 hover:bg-blue-50 px-4 py-2.5 rounded-lg text-sm font-semibold shadow-sm transition">
+                            <i class="fa-solid fa-graduation-cap mr-2"></i>Mulai Belajar
+                        </button>
+                    </div>
+                </div>
+
+                <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+                    <div class="bg-white p-5 rounded-xl border border-slate-200 shadow-xs">
+                        <div class="flex items-center justify-between"><span class="text-xs text-slate-500 font-semibold uppercase">Jam Belajar</span><i class="fa-solid fa-clock text-blue-600"></i></div>
+                        <div id="dashboardStudyTime" class="text-xl font-bold text-slate-900 mt-2">0 Jam 0 Min</div>
+                        <p id="dashboardTargetText" class="text-[10px] text-slate-400 mt-1">Target 10 jam per bulan</p>
+                    </div>
+                    <div class="bg-white p-5 rounded-xl border border-slate-200 shadow-xs">
+                        <div class="flex items-center justify-between"><span class="text-xs text-slate-500 font-semibold uppercase">Modul Lulus</span><i class="fa-solid fa-circle-check text-emerald-600"></i></div>
+                        <div id="dashboardCompleted" class="text-xl font-bold text-slate-900 mt-2">0 Modul</div>
+                        <p class="text-[10px] text-slate-400 mt-1">Berdasarkan hasil kuis</p>
+                    </div>
+                    <div class="bg-white p-5 rounded-xl border border-slate-200 shadow-xs">
+                        <div class="flex items-center justify-between"><span class="text-xs text-slate-500 font-semibold uppercase">Progress Bulanan</span><i class="fa-solid fa-chart-line text-sky-600"></i></div>
+                        <div id="dashboardProgress" class="text-xl font-bold text-slate-900 mt-2">0%</div>
+                        <div class="h-1.5 bg-slate-100 rounded-full mt-2"><div id="dashboardProgressBar" class="h-1.5 bg-sky-500 rounded-full" style="width: 0%"></div></div>
+                    </div>
+                    <div class="bg-white p-5 rounded-xl border border-slate-200 shadow-xs">
+                        <div class="flex items-center justify-between"><span class="text-xs text-slate-500 font-semibold uppercase">Absensi Hari Ini</span><i class="fa-solid fa-fingerprint text-amber-600"></i></div>
+                        <div id="dashboardAttendance" class="text-xl font-bold text-slate-900 mt-2">Belum mulai</div>
+                        <p class="text-[10px] text-slate-400 mt-1">Sesi training aktif</p>
+                    </div>
+                </div>
+
+                <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+                    <div class="lg:col-span-2 bg-white rounded-xl border border-slate-200 shadow-xs p-6">
+                        <div class="flex items-center justify-between border-b border-slate-100 pb-3 mb-3">
+                            <h3 class="text-sm font-bold text-slate-900"><i class="fa-solid fa-list-check text-blue-600 mr-2"></i>Aktivitas Training Terbaru</h3>
+                            <button onclick="switchTab('rekap')" class="text-xs text-blue-600 hover:underline font-semibold">Lihat semua</button>
+                        </div>
+                        <div id="dashboardRecentActivity" class="divide-y divide-slate-100"></div>
+                    </div>
+                    <div class="bg-white rounded-xl border border-slate-200 shadow-xs p-6">
+                        <h3 class="text-sm font-bold text-slate-900 border-b border-slate-100 pb-3 mb-4"><i class="fa-solid fa-bolt text-amber-500 mr-2"></i>Akses Cepat</h3>
+                        <div class="space-y-2">
+                            <button onclick="switchTab('attendance')" class="w-full flex items-center gap-3 p-3 rounded-lg bg-slate-50 hover:bg-blue-50 text-left transition"><i class="fa-solid fa-fingerprint text-blue-600"></i><span class="text-xs font-semibold text-slate-700">Kelola absensi</span></button>
+                            <button onclick="switchTab('training')" class="w-full flex items-center gap-3 p-3 rounded-lg bg-slate-50 hover:bg-blue-50 text-left transition"><i class="fa-solid fa-book-open text-emerald-600"></i><span class="text-xs font-semibold text-slate-700">Buka materi training</span></button>
+                            <button onclick="switchTab('certificate')" class="w-full flex items-center gap-3 p-3 rounded-lg bg-slate-50 hover:bg-blue-50 text-left transition"><i class="fa-solid fa-award text-amber-600"></i><span class="text-xs font-semibold text-slate-700">Lihat sertifikat</span></button>
+                        </div>
+                    </div>
+                </div>
+                <div id="hotelOverviewStats" class="hidden bg-white rounded-xl border border-slate-200 shadow-xs p-6">
+                    <div class="flex items-center justify-between border-b border-slate-100 pb-3 mb-4"><h3 class="text-sm font-bold text-slate-900"><i class="fa-solid fa-chart-pie text-blue-600 mr-2"></i>Statistik Hotel Keseluruhan</h3><span class="text-[10px] text-slate-400">Khusus HR & Super Admin</span></div>
+                    <div class="grid grid-cols-2 md:grid-cols-4 gap-3">
+                        <div class="bg-slate-50 rounded-lg p-3"><div class="text-[10px] uppercase font-semibold text-slate-500">Total User</div><div id="hotelStatUsers" class="text-xl font-bold text-slate-900 mt-1">0</div></div>
+                        <div class="bg-slate-50 rounded-lg p-3"><div class="text-[10px] uppercase font-semibold text-slate-500">Total Modul</div><div id="hotelStatModules" class="text-xl font-bold text-slate-900 mt-1">0</div></div>
+                        <div class="bg-slate-50 rounded-lg p-3"><div class="text-[10px] uppercase font-semibold text-slate-500">Modul Lulus</div><div id="hotelStatPassed" class="text-xl font-bold text-emerald-600 mt-1">0</div></div>
+                        <div class="bg-slate-50 rounded-lg p-3"><div class="text-[10px] uppercase font-semibold text-slate-500">Rata-rata Nilai</div><div id="hotelStatScore" class="text-xl font-bold text-blue-600 mt-1">-</div></div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- TAB 0B: TEAM MONITORING -->
+            <section id="tab-management" class="tab-content space-y-6 hidden">
+                <div class="flex flex-col md:flex-row md:items-center justify-between gap-4">
+                    <div>
+                        <h2 class="text-lg font-bold text-slate-900"><i class="fa-solid fa-users-viewfinder text-blue-600 mr-2"></i>Monitoring Tim</h2>
+                        <p class="text-xs text-slate-500 mt-0.5">Pantau pencapaian training staff berdasarkan departemen dan target bulanan.</p>
+                    </div>
+                    <div>
+                        <label for="teamDeptFilter" class="sr-only">Filter departemen</label>
+                        <select id="teamDeptFilter" onchange="renderTeamMonitoring()" class="px-3 py-2 rounded-lg border border-slate-300 text-xs bg-white"></select>
+                    </div>
+                </div>
+
+                <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+                    <div class="bg-white p-5 rounded-xl border border-slate-200 shadow-xs"><div class="text-xs text-slate-500 font-semibold uppercase">Total Staff</div><div id="teamTotalStaff" class="text-xl font-bold text-slate-900 mt-2">0</div></div>
+                    <div class="bg-white p-5 rounded-xl border border-slate-200 shadow-xs"><div class="text-xs text-slate-500 font-semibold uppercase">Mencapai Target</div><div id="teamOnTrack" class="text-xl font-bold text-emerald-600 mt-2">0</div><div class="text-[10px] text-slate-400 mt-1">Minimal 10 jam / bulan</div></div>
+                    <div class="bg-white p-5 rounded-xl border border-slate-200 shadow-xs"><div class="text-xs text-slate-500 font-semibold uppercase">Perlu Perhatian</div><div id="teamNeedsAttention" class="text-xl font-bold text-amber-600 mt-2">0</div><div class="text-[10px] text-slate-400 mt-1">Belum mencapai target</div></div>
+                    <div class="bg-white p-5 rounded-xl border border-slate-200 shadow-xs"><div class="text-xs text-slate-500 font-semibold uppercase">Rata-rata Nilai</div><div id="teamAverageScore" class="text-xl font-bold text-blue-600 mt-2">0</div><div class="text-[10px] text-slate-400 mt-1">Dari hasil kuis</div></div>
+                </div>
+
+                <div class="bg-white rounded-xl border border-slate-200 shadow-xs p-6">
+                    <div class="overflow-x-auto rounded-lg border border-slate-200">
+                        <table class="w-full text-left border-collapse text-xs">
+                            <thead><tr class="bg-slate-100 text-slate-600 uppercase font-semibold"><th class="p-3">Nama Staff</th><th class="p-3">Departemen</th><th class="p-3">Jam Belajar</th><th class="p-3">Modul Lulus</th><th class="p-3">Rata-rata Nilai</th><th class="p-3">Status Target</th></tr></thead>
+                            <tbody id="teamMonitoringTableBody" class="divide-y divide-slate-200"></tbody>
+                        </table>
+                    </div>
+                </div>
+            </section>
 
             <!-- TAB 1: ATTENDANCE -->
             <section id="tab-attendance" class="tab-content space-y-6">
@@ -169,12 +375,11 @@
                     </div>
 
                     <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
-                        <!-- Clock In Control Box -->
                         <div class="bg-slate-50 rounded-xl p-5 border border-slate-200 flex flex-col justify-between">
                             <div>
                                 <span class="text-xs font-semibold text-slate-400 uppercase tracking-wider">Waktu Lokal Bali (WITA)</span>
                                 <div id="liveClock" class="text-2xl font-mono font-bold text-slate-800 mt-1">00:00:00</div>
-                                <div id="liveDate" class="text-xs text-slate-500 mt-0.5">Kamis, 13 Agustus 2026</div>
+                                <div id="liveDate" class="text-xs text-slate-500 mt-0.5">Senin, 17 Agustus 2026</div>
                             </div>
                             <div class="mt-6 space-y-3">
                                 <button onclick="handleClockIn()" id="btnClockIn" class="w-full bg-emerald-600 hover:bg-emerald-700 text-white font-medium py-2.5 rounded-lg text-sm shadow-sm transition">
@@ -186,7 +391,6 @@
                             </div>
                         </div>
 
-                        <!-- Info & Guidelines -->
                         <div class="md:col-span-2 bg-blue-50/50 rounded-xl p-5 border border-blue-200 text-xs text-slate-700 space-y-3">
                             <h3 class="font-bold text-blue-900 text-sm flex items-center">
                                 <i class="fa-solid fa-circle-info mr-2"></i> Ketentuan Absensi Training Solia Legian
@@ -200,7 +404,6 @@
                         </div>
                     </div>
 
-                    <!-- Attendance Log Table -->
                     <div class="mt-8">
                         <h3 class="text-sm font-bold text-slate-800 mb-3"><i class="fa-solid fa-table-list text-blue-600 mr-2"></i>Riwayat Absensi Kehadiran</h3>
                         <div class="overflow-x-auto rounded-lg border border-slate-200">
@@ -233,8 +436,11 @@
                             <h2 class="text-lg font-bold text-slate-900"><i class="fa-solid fa-book-open text-blue-600 mr-2"></i>Pusat Materi Training Departemen</h2>
                             <p class="text-xs text-slate-500 mt-0.5">Pilih departemen dan modul pembelajaran standar operasional Solia Legian Bali.</p>
                         </div>
-                        <div class="flex items-center space-x-2">
-                            <span class="text-xs font-semibold text-slate-500">Filter Tipe:</span>
+                        <div class="flex flex-wrap items-center gap-2">
+                            <button id="btnOpenUploadModal" onclick="openUploadModal()" class="bg-indigo-600 hover:bg-indigo-700 text-white px-3.5 py-1.5 rounded-lg text-xs font-medium transition shadow-xs hidden">
+                                <i class="fa-solid fa-cloud-arrow-up mr-1.5"></i> Upload Materi Baru
+                            </button>
+                            <span class="text-xs font-semibold text-slate-500 ml-2">Filter Tipe:</span>
                             <select id="filterType" onchange="renderModules()" class="px-3 py-1.5 rounded-lg border border-slate-300 text-xs bg-white focus:outline-none focus:ring-1 focus:ring-blue-600">
                                 <option value="all">Semua Tipe</option>
                                 <option value="SOP">SOP Dokumen</option>
@@ -244,16 +450,35 @@
                         </div>
                     </div>
 
-                    <!-- Department Tabs Scrollable -->
                     <div class="flex space-x-2 overflow-x-auto pb-2 custom-scrollbar" id="deptTabsContainer"></div>
                 </div>
 
-                <!-- Module Cards Grid -->
                 <div class="grid grid-cols-1 md:grid-cols-3 gap-6" id="moduleCardsContainer"></div>
             </section>
 
             <!-- TAB 3: REKAP & EVALUASI -->
             <section id="tab-rekap" class="tab-content space-y-6 hidden">
+                <div id="managerFilterBar" class="bg-white p-4 rounded-xl border border-slate-200 shadow-xs flex flex-wrap items-center justify-between gap-4 hidden">
+                    <div>
+                        <h3 class="text-sm font-bold text-slate-900"><i class="fa-solid fa-filter text-blue-600 mr-2"></i>Panel Pengawasan Rekap Staff (Manajerial)</h3>
+                        <p class="text-xs text-slate-500">Pilih departemen atau staff spesifik untuk melihat laporan pelatihan.</p>
+                    </div>
+                    <div class="flex flex-wrap items-center gap-3">
+                        <div>
+                            <label class="block text-[10px] uppercase font-semibold text-slate-500 mb-1">Filter Departemen</label>
+                            <select id="adminFilterDept" onchange="onAdminDeptFilterChange()" class="px-3 py-1.5 rounded-lg border border-slate-300 text-xs bg-white">
+                                <option value="All">Semua Departemen</option>
+                            </select>
+                        </div>
+                        <div>
+                            <label class="block text-[10px] uppercase font-semibold text-slate-500 mb-1">Pilih Staff</label>
+                            <select id="adminFilterStaff" onchange="renderRekapData()" class="px-3 py-1.5 rounded-lg border border-slate-300 text-xs bg-white">
+                                <option value="All">Semua Staff</option>
+                            </select>
+                        </div>
+                    </div>
+                </div>
+
                 <div class="grid grid-cols-1 md:grid-cols-4 gap-4">
                     <div class="bg-white p-5 rounded-xl border border-slate-200 shadow-xs flex items-center space-x-4">
                         <div class="w-12 h-12 rounded-lg bg-blue-50 text-blue-600 flex items-center justify-center text-xl font-bold">
@@ -290,20 +515,20 @@
                             <i class="fa-solid fa-award"></i>
                         </div>
                         <div>
-                            <div class="text-xs text-slate-400 font-semibold uppercase">Status Kinerja</div>
+                            <div class="text-xs text-slate-400 font-semibold uppercase">Status</div>
                             <div id="statBadgeStatus" class="text-sm font-bold text-indigo-700">Aktif Berproses</div>
                             <div class="text-[10px] text-indigo-500 font-medium">Staff Solia Legian</div>
                         </div>
                     </div>
                 </div>
 
-                <!-- Detailed Rekap Table -->
                 <div class="bg-white rounded-xl shadow-xs border border-slate-200 p-6">
                     <h3 class="text-base font-bold text-slate-900 mb-4"><i class="fa-solid fa-file-invoice text-blue-600 mr-2"></i>Rekapitulasi Aktivitas & Kuis Pelatihan Staff</h3>
                     <div class="overflow-x-auto rounded-lg border border-slate-200">
                         <table class="w-full text-left border-collapse text-xs">
                             <thead>
                                 <tr class="bg-slate-100 text-slate-600 uppercase font-semibold">
+                                    <th class="p-3">Nama Staff</th>
                                     <th class="p-3">Judul Modul</th>
                                     <th class="p-3">Departemen</th>
                                     <th class="p-3">Waktu Akses</th>
@@ -314,7 +539,7 @@
                             </thead>
                             <tbody id="rekapTableBody" class="divide-y divide-slate-200">
                                 <tr>
-                                    <td colspan="6" class="p-4 text-center text-slate-400">Belum ada aktivitas training tercatat. Silakan pelajari modul di tab Training.</td>
+                                    <td colspan="7" class="p-4 text-center text-slate-400">Belum ada aktivitas training tercatat.</td>
                                 </tr>
                             </tbody>
                         </table>
@@ -322,44 +547,162 @@
                 </div>
             </section>
 
-            <!-- TAB 4: SUPER ADMIN -->
-            <section id="tab-admin" class="tab-content space-y-6 hidden">
+            <!-- TAB 4: SERTIFIKAT -->
+            <section id="tab-certificate" class="tab-content space-y-6 hidden">
                 <div class="bg-white rounded-xl shadow-xs border border-slate-200 p-6">
-                    <div class="flex items-center justify-between border-b border-slate-100 pb-4 mb-6">
+                    <div class="flex flex-col md:flex-row md:items-center justify-between gap-4 border-b border-slate-100 pb-4 mb-6">
                         <div>
-                            <h2 class="text-lg font-bold text-slate-900"><i class="fa-solid fa-user-gear text-blue-600 mr-2"></i>Panel Super Admin & Manajemen HRD</h2>
-                            <p class="text-xs text-slate-500 mt-0.5">Kelola akses staff, ubah role, department, dan atur template kuis evaluasi hotel.</p>
+                            <h2 class="text-lg font-bold text-slate-900"><i class="fa-solid fa-award text-amber-500 mr-2"></i>Sertifikat Kelulusan Pelatihan Hotel</h2>
+                            <p class="text-xs text-slate-500 mt-0.5">Sertifikat resmi penghargaan penyelesaian akademi training Solia Legian Bali.</p>
                         </div>
-                        <button onclick="openAddUserModal()" class="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg text-xs font-medium transition shadow-xs">
+                        <div id="certFilterContainer" class="flex items-center space-x-2 hidden">
+                            <select id="certStaffSelect" onchange="renderCertificateView()" class="px-3 py-1.5 rounded-lg border border-slate-300 text-xs bg-white">
+                                <option value="All">Pilih Staff...</option>
+                            </select>
+                        </div>
+                    </div>
+
+                    <!-- Certificate Display Area -->
+                    <div id="printableCertificate" class="bg-gradient-to-br from-amber-50 via-white to-blue-50 border-8 border-double border-amber-600/60 rounded-2xl p-8 md:p-12 text-center relative shadow-md max-w-4xl mx-auto my-4">
+                        <div class="absolute top-4 left-4 text-amber-700/30 text-4xl"><i class="fa-solid fa-hotel"></i></div>
+                        <div class="absolute top-4 right-4 text-amber-700/30 text-4xl"><i class="fa-solid fa-award"></i></div>
+                        
+                        <div class="space-y-4">
+                            <div class="text-xs font-bold uppercase tracking-widest text-amber-800">Solia Legian Bali Training Academy</div>
+                            <h3 class="text-2xl md:text-4xl font-serif font-bold text-slate-900 tracking-wide">SERTIFIKAT KELULUSAN</h3>
+                            <p class="text-xs italic text-slate-500">Certificate of Completion</p>
+                            
+                            <div class="py-4">
+                                <p class="text-xs uppercase text-slate-600 tracking-wider">Diberikan dengan bangga kepada:</p>
+                                <h4 id="certStaffName" class="text-xl md:text-3xl font-bold text-blue-900 font-serif mt-2 border-b-2 border-amber-500/40 pb-2 inline-block min-w-[300px]">-</h4>
+                                <p id="certStaffDetail" class="text-xs font-medium text-slate-600 mt-1">Front Desk Agent - Front Office Department</p>
+                            </div>
+
+                            <p class="text-xs text-slate-600 max-w-xl mx-auto leading-relaxed">
+                                Atas dedikasi, kedisiplinan kehadiran, serta keberhasilan menyelesaikan seluruh modul pelatihan Standar Operasional Prosedur (SOP) dan kuis evaluasi dengan predikat <strong class="text-emerald-700">LULUS</strong> pada periode pelatihan hotel tahun 2026.
+                            </p>
+
+                            <div class="grid grid-cols-2 gap-8 pt-10 mt-6 border-t border-slate-200 text-center text-xs">
+                                <div>
+                                    <div class="font-bold text-slate-800">Human Resources Manager</div>
+                                    <div class="h-12 flex items-center justify-center font-serif italic text-blue-900 font-bold text-sm">Putu Ayu, S.Psi</div>
+                                    <div class="text-[10px] text-slate-500">Solia Legian Bali</div>
+                                </div>
+                                <div>
+                                    <div class="font-bold text-slate-800">General Manager</div>
+                                    <div class="h-12 flex items-center justify-center font-serif italic text-blue-900 font-bold text-sm">Wayan Wirawan, CHA</div>
+                                    <div class="text-[10px] text-slate-500">Solia Legian Bali</div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="flex justify-center mt-6">
+                        <button onclick="window.print()" class="bg-blue-600 hover:bg-blue-700 text-white px-6 py-2.5 rounded-lg text-xs font-medium transition shadow-sm">
+                            <i class="fa-solid fa-print mr-2"></i> Cetak / Unduh Sertifikat PDF
+                        </button>
+                    </div>
+                </div>
+            </section>
+
+            <!-- TAB 5: TOOLS (PANEL ADMIN KHUSUS SUPER ADMIN) -->
+            <section id="tab-tools" class="tab-content space-y-6 hidden">
+                <div class="bg-white rounded-xl shadow-xs border border-slate-200 p-6 space-y-6">
+                    <div class="flex items-center justify-between border-b border-slate-100 pb-4">
+                        <div>
+                            <h2 class="text-lg font-bold text-slate-900"><i class="fa-solid fa-toolbox text-blue-600 mr-2"></i>Panel Tools & Access Control</h2>
+                            <p class="text-xs text-slate-500 mt-0.5">Kelola pengaturan matriks hak akses dan akun staff sistem.</p>
+                        </div>
+                        <button id="btnAddUserMain" onclick="openAddUserModal()" class="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg text-xs font-medium transition shadow-xs">
                             <i class="fa-solid fa-user-plus mr-1"></i> Tambah Staff Baru
                         </button>
                     </div>
 
-                    <!-- Staff Accounts Table -->
-                    <h3 class="text-sm font-bold text-slate-800 mb-3">Daftar Akun Staff Terdaftar</h3>
-                    <div class="overflow-x-auto rounded-lg border border-slate-200 mb-8">
-                        <table class="w-full text-left border-collapse text-xs">
-                            <thead>
-                                <tr class="bg-slate-100 text-slate-600 uppercase font-semibold">
-                                    <th class="p-3">Nama Staff</th>
-                                    <th class="p-3">Email</th>
-                                    <th class="p-3">Departemen</th>
-                                    <th class="p-3">Role Akses</th>
-                                    <th class="p-3 text-right">Aksi Manajemen</th>
-                                </tr>
-                            </thead>
-                            <tbody id="adminUserTableBody" class="divide-y divide-slate-200"></tbody>
-                        </table>
+                    <!-- SUB-BAGIAN 1: PERMISSION CHECKLIST BERBASIS ROLE -->
+                    <div id="superAdminSection1" class="space-y-3">
+                        <div class="flex items-center justify-between">
+                            <h3 class="text-sm font-bold text-slate-800"><i class="fa-solid fa-shield-halved text-blue-600 mr-2"></i>Matriks Pengaturan Hak Akses (Permission Checklist)</h3>
+                            <span class="text-[11px] text-slate-500">Hanya Super Admin yang dapat mengubah izin role</span>
+                        </div>
+                        <div class="overflow-x-auto rounded-lg border border-slate-200">
+                            <table class="w-full text-left border-collapse text-xs">
+                                <thead>
+                                    <tr class="bg-slate-100 text-slate-600 uppercase font-semibold">
+                                        <th class="p-3">Level Role</th>
+                                        <th class="p-3 text-center">Attendance</th>
+                                        <th class="p-3 text-center">Training Material</th>
+                                        <th class="p-3 text-center">Rekap & Evaluasi</th>
+                                        <th class="p-3 text-center">Monitoring Tim</th>
+                                        <th class="p-3 text-center">Sertifikat</th>
+                                        <th class="p-3 text-center">Upload Materi</th>
+                                        <th class="p-3 text-center">Edit/Hapus Materi</th>
+                                        <th class="p-3 text-center">Manajemen User</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="toolsPermissionTableBody" class="divide-y divide-slate-200"></tbody>
+                            </table>
+                        </div>
                     </div>
 
-                    <!-- HRD Quiz Question Template Editor Section -->
-                    <div class="border-t border-slate-100 pt-6">
-                        <div class="flex items-center justify-between mb-3">
-                            <h3 class="text-sm font-bold text-slate-800"><i class="fa-solid fa-list-check text-blue-600 mr-2"></i>Pengaturan Bank Soal & Evaluasi HRD</h3>
-                            <span class="text-xs text-slate-500">Pilih modul untuk mengedit pertanyaan kuis</span>
+                    <div id="superAdminSectionProfile" class="space-y-4 pt-4 border-t border-slate-100">
+                        <div>
+                            <h3 class="text-sm font-bold text-slate-800"><i class="fa-solid fa-building text-blue-600 mr-2"></i>Profil Hotel & Pengaturan LMS</h3>
+                            <p class="text-[11px] text-slate-500 mt-1">Informasi ini tampil pada header dan Dashboard seluruh pengguna.</p>
                         </div>
-                        <select id="adminModuleSelect" onchange="renderAdminQuizEditor()" class="w-full md:w-1/3 px-3 py-2 rounded-lg border border-slate-300 text-xs bg-white mb-4 focus:outline-none focus:ring-1 focus:ring-blue-600"></select>
-                        <div id="adminQuizEditorContainer" class="space-y-4 bg-slate-50 p-4 rounded-xl border border-slate-200"></div>
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-3">
+                            <div><label class="block text-xs font-semibold text-slate-600 mb-1">Nama Hotel</label><input id="settingsHotelName" type="text" class="w-full px-3 py-2 rounded-lg border border-slate-300 text-xs"></div>
+                            <div><label class="block text-xs font-semibold text-slate-600 mb-1">Nama / Subtitle Portal</label><input id="settingsPortalSubtitle" type="text" class="w-full px-3 py-2 rounded-lg border border-slate-300 text-xs"></div>
+                            <div><label class="block text-xs font-semibold text-slate-600 mb-1">Detail Hotel</label><input id="settingsHotelDetail" type="text" class="w-full px-3 py-2 rounded-lg border border-slate-300 text-xs" placeholder="Contoh: Hotel & Resort Bali"></div>
+                            <div><label class="block text-xs font-semibold text-slate-600 mb-1">Kontak HR / Training</label><input id="settingsHotelContact" type="text" class="w-full px-3 py-2 rounded-lg border border-slate-300 text-xs" placeholder="Contoh: HRD ext. 123 | hr@hotel.com"></div>
+                            <div><label class="block text-xs font-semibold text-slate-600 mb-1">Target Belajar Bulanan (menit)</label><input id="settingsMonthlyTarget" type="number" min="1" class="w-full px-3 py-2 rounded-lg border border-slate-300 text-xs"></div>
+                            <div><label class="block text-xs font-semibold text-slate-600 mb-1">Logo Hotel</label><input id="settingsHotelLogo" type="file" accept="image/png,image/jpeg,image/webp" onchange="previewHotelLogo(this)" class="block w-full text-xs text-slate-600 file:mr-2 file:py-1.5 file:px-3 file:rounded-lg file:border-0 file:bg-blue-600 file:text-white"></div>
+                        </div>
+                        <div class="flex justify-end"><button onclick="savePortalSettings()" class="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg text-xs font-semibold"><i class="fa-solid fa-floppy-disk mr-2"></i>Simpan Profil Hotel</button></div>
+                    </div>
+
+                    <div id="superAdminSectionTrainingSettings" class="space-y-4 pt-4 border-t border-slate-100">
+                        <div><h3 class="text-sm font-bold text-slate-800"><i class="fa-solid fa-sliders text-blue-600 mr-2"></i>Pengaturan Training & Notifikasi</h3><p class="text-[11px] text-slate-500 mt-1">Atur periode, nilai kelulusan, dan pengingat training.</p></div>
+                        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-3">
+                            <div><label class="block text-xs font-semibold text-slate-600 mb-1">Periode Mulai</label><input id="settingsPeriodStart" type="date" class="w-full px-3 py-2 rounded-lg border border-slate-300 text-xs"></div>
+                            <div><label class="block text-xs font-semibold text-slate-600 mb-1">Periode Selesai</label><input id="settingsPeriodEnd" type="date" class="w-full px-3 py-2 rounded-lg border border-slate-300 text-xs"></div>
+                            <div><label class="block text-xs font-semibold text-slate-600 mb-1">Nilai Lulus (%)</label><input id="settingsPassingScore" type="number" min="1" max="100" class="w-full px-3 py-2 rounded-lg border border-slate-300 text-xs"></div>
+                            <label class="flex items-center gap-2 text-xs text-slate-700 mt-5"><input id="settingsNotifications" type="checkbox" class="rounded border-slate-300 text-blue-600"> Aktifkan pengingat training</label>
+                        </div>
+                        <div class="flex justify-end"><button onclick="saveTrainingSettings()" class="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg text-xs font-semibold"><i class="fa-solid fa-floppy-disk mr-2"></i>Simpan Pengaturan Training</button></div>
+                    </div>
+
+                    <div id="superAdminSectionData" class="space-y-4 pt-4 border-t border-slate-100">
+                        <div><h3 class="text-sm font-bold text-slate-800"><i class="fa-solid fa-database text-blue-600 mr-2"></i>Backup, Restore & Log Aktivitas</h3><p class="text-[11px] text-slate-500 mt-1">Pindahkan data prototype atau audit perubahan yang dilakukan Admin.</p></div>
+                        <div class="flex flex-wrap gap-2"><button onclick="exportLmsBackup()" class="bg-emerald-600 hover:bg-emerald-700 text-white px-3 py-2 rounded-lg text-xs font-semibold"><i class="fa-solid fa-download mr-2"></i>Backup Data</button><label class="bg-slate-700 hover:bg-slate-800 text-white px-3 py-2 rounded-lg text-xs font-semibold cursor-pointer"><i class="fa-solid fa-upload mr-2"></i>Restore Data<input type="file" accept="application/json" onchange="restoreLmsBackup(this)" class="hidden"></label></div>
+                        <div class="overflow-x-auto rounded-lg border border-slate-200"><table class="w-full text-left text-xs"><thead><tr class="bg-slate-100 text-slate-600 uppercase font-semibold"><th class="p-3">Waktu</th><th class="p-3">Admin</th><th class="p-3">Aktivitas</th><th class="p-3">Detail</th></tr></thead><tbody id="adminActivityTableBody" class="divide-y divide-slate-200"></tbody></table></div>
+                    </div>
+
+                    <!-- SUB-BAGIAN 2: DAFTAR AKUN STAFF -->
+                    <div id="superAdminSection2" class="space-y-3 pt-4 border-t border-slate-100">
+                        <div class="flex flex-col md:flex-row md:items-center justify-between gap-3">
+                            <h3 class="text-sm font-bold text-slate-800"><i class="fa-solid fa-users-gear text-blue-600 mr-2"></i>Daftar Akun Staff Terdaftar</h3>
+                            <div class="flex items-center gap-2">
+                                <label for="toolsDeptFilter" class="text-[10px] uppercase font-semibold text-slate-500">Filter Departemen</label>
+                                <select id="toolsDeptFilter" onchange="renderAdminUserTable()" class="px-3 py-1.5 rounded-lg border border-slate-300 text-xs bg-white">
+                                    <option value="All">Semua Departemen</option>
+                                </select>
+                            </div>
+                        </div>
+                        <div class="overflow-x-auto rounded-lg border border-slate-200">
+                            <table class="w-full text-left border-collapse text-xs">
+                                <thead>
+                                    <tr class="bg-slate-100 text-slate-600 uppercase font-semibold">
+                                        <th class="p-3">Nama Staff</th>
+                                        <th class="p-3">Email</th>
+                                        <th class="p-3">Departemen</th>
+                                        <th class="p-3">Jabatan</th>
+                                        <th class="p-3">Role Akses</th>
+                                        <th class="p-3 text-right">Aksi Manajemen</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="adminUserTableBody" class="divide-y divide-slate-200"></tbody>
+                            </table>
+                        </div>
                     </div>
                 </div>
             </section>
@@ -367,10 +710,141 @@
         </main>
     </div>
 
+    <!-- MODAL: UPLOAD MATERI + BANK SOAL WAJIB -->
+    <div id="uploadModal" class="fixed inset-0 bg-slate-900/70 z-50 flex items-center justify-center p-4 hidden">
+        <div class="bg-white rounded-2xl shadow-2xl max-w-2xl w-full max-h-[90vh] flex flex-col overflow-hidden">
+            <div class="px-6 py-4 bg-indigo-900 text-white flex items-center justify-between">
+                <h3 class="text-base font-bold"><i class="fa-solid fa-cloud-arrow-up mr-2"></i>Upload Modul Training Baru & Bank Soal Wajib</h3>
+                <button onclick="closeUploadModal()" class="text-slate-300 hover:text-white text-lg"><i class="fa-solid fa-xmark"></i></button>
+            </div>
+            
+            <div class="flex-1 overflow-y-auto p-6 space-y-5 custom-scrollbar text-xs">
+                <!-- Bagian 1: Detail Modul -->
+                <div class="space-y-3">
+                    <h4 class="font-bold text-slate-900 text-sm border-b pb-1"><i class="fa-solid fa-circle-info text-indigo-600 mr-1.5"></i> Informasi Modul</h4>
+                    <div>
+                        <label class="block font-semibold text-slate-600 mb-1">Judul Modul</label>
+                        <input type="text" id="uploadTitle" class="w-full px-3 py-2 rounded-lg border border-slate-300" placeholder="Contoh: Standard Room Setup Pro">
+                    </div>
+                    <div class="grid grid-cols-2 gap-3">
+                        <div>
+                            <label class="block font-semibold text-slate-600 mb-1">Departemen Tujuan</label>
+                            <select id="uploadDept" onchange="renderUploadAccessOptions()" class="w-full px-3 py-2 rounded-lg border border-slate-300 bg-white">
+                                <option value="Front Office">Front Office</option>
+                                <option value="Housekeeping">Housekeeping</option>
+                                <option value="F&B Service">F&B Service</option>
+                                <option value="F&B Product (Kitchen)">F&B Product (Kitchen)</option>
+                                <option value="Engineering">Engineering</option>
+                                <option value="Security & Safety">Security & Safety</option>
+                                <option value="Sales & Marketing">Sales & Marketing</option>
+                                <option value="Human Resources">Human Resources</option>
+                                <option value="Accounting & Finance">Accounting & Finance</option>
+                            </select>
+                        </div>
+                        <div>
+                            <label class="block font-semibold text-slate-600 mb-1">Tipe Materi</label>
+                            <select id="uploadType" class="w-full px-3 py-2 rounded-lg border border-slate-300 bg-white">
+                                <option value="SOP">SOP Dokumen</option>
+                                <option value="PDF">PDF / Presentasi</option>
+                                <option value="Video">Video Tutorial</option>
+                            </select>
+                        </div>
+                    </div>
+                    <div class="bg-slate-50 border border-slate-200 rounded-lg p-3 space-y-3">
+                        <div>
+                            <label for="uploadAccessScope" class="block font-semibold text-slate-600 mb-1">Cakupan Akses Materi</label>
+                            <select id="uploadAccessScope" onchange="renderUploadAccessOptions()" class="w-full px-3 py-2 rounded-lg border border-slate-300 bg-white">
+                                <option value="department">Departemen tertentu</option>
+                                <option value="all">Semua departemen</option>
+                                <option value="position">Staff / posisi tertentu</option>
+                            </select>
+                        </div>
+                        <div id="uploadAccessOptions" class="space-y-2"></div>
+                        <p class="text-[10px] text-slate-500">Staff hanya dapat melihat materi jika departemen atau nama staffnya dipilih dalam cakupan akses.</p>
+                    </div>
+                    <div class="grid grid-cols-2 gap-3">
+                        <div>
+                            <label class="block font-semibold text-slate-600 mb-1">Estimasi Durasi</label>
+                            <input type="text" id="uploadDuration" class="w-full px-3 py-2 rounded-lg border border-slate-300" placeholder="Contoh: 30 Menit">
+                        </div>
+                        <div>
+                            <label class="block font-semibold text-slate-600 mb-1">Link File / URL Sumber</label>
+                            <input type="text" id="uploadUrl" class="w-full px-3 py-2 rounded-lg border border-slate-300" placeholder="https://url-file.com/file.pdf atau mp4">
+                        </div>
+                    </div>
+                    <div class="bg-indigo-50 border border-indigo-200 rounded-lg p-3">
+                        <label for="uploadFile" class="block font-semibold text-indigo-900 mb-1">Atau Pilih File dari Komputer / Handphone</label>
+                        <input type="file" id="uploadFile" accept=".pdf,.ppt,.pptx,.mp4,.webm,.mov,application/pdf,application/vnd.ms-powerpoint,application/vnd.openxmlformats-officedocument.presentationml.presentation,video/mp4,video/webm,video/quicktime" onchange="handleUploadFileSelection(this)" class="block w-full text-xs text-slate-600 file:mr-3 file:py-1.5 file:px-3 file:rounded-lg file:border-0 file:bg-indigo-600 file:text-white file:font-semibold hover:file:bg-indigo-700">
+                        <p class="text-[10px] text-indigo-700 mt-1">Format yang didukung: PDF, PowerPoint, MP4, WEBM, MOV. Pilih URL atau file lokal.</p>
+                        <p id="uploadFileName" class="text-[11px] font-semibold text-slate-600 mt-1"></p>
+                    </div>
+                    <div>
+                        <label class="block font-semibold text-slate-600 mb-1">Deskripsi Singkat</label>
+                        <textarea id="uploadDesc" rows="2" class="w-full px-3 py-2 rounded-lg border border-slate-300" placeholder="Deskripsi ringkas materi pelatihan..."></textarea>
+                    </div>
+                </div>
+
+                <!-- Bagian 2: Bank Soal Wajib -->
+                <div class="space-y-3 pt-3 border-t border-slate-200">
+                    <div class="flex items-center justify-between">
+                        <h4 class="font-bold text-slate-900 text-sm"><i class="fa-solid fa-list-check text-indigo-600 mr-1.5"></i> Bank Soal Evaluasi Kuis <span class="text-rose-600">*Wajib Diisi</span></h4>
+                        <button onclick="addQuizQuestionField()" class="bg-slate-100 hover:bg-slate-200 text-slate-700 px-2.5 py-1 rounded font-semibold text-[11px] transition">
+                            <i class="fa-solid fa-plus mr-1"></i> Tambah Pertanyaan
+                        </button>
+                    </div>
+                    <p class="text-[11px] text-slate-500">Anda wajib menyertakan minimal 1 pertanyaan kuis evaluasi yang harus dikerjakan staff setelah mempelajari materi ini.</p>
+                    
+                    <div id="uploadQuizContainer" class="space-y-4">
+                        <div class="bg-slate-50 p-3.5 rounded-xl border border-slate-200 space-y-2 quiz-question-block">
+                            <div class="flex items-center justify-between">
+                                <span class="font-bold text-slate-700 text-xs q-number">Pertanyaan 1</span>
+                            </div>
+                            <div>
+                                <label class="block font-semibold text-slate-600 mb-0.5">Teks Pertanyaan</label>
+                                <input type="text" class="q-text w-full px-3 py-1.5 rounded-lg border border-slate-300 text-xs" placeholder="Contoh: Apa langkah pertama prosedur...">
+                            </div>
+                            <div class="grid grid-cols-2 gap-2">
+                                <div>
+                                    <label class="block font-semibold text-slate-600 mb-0.5">Pilihan A</label>
+                                    <input type="text" class="opt-0 w-full px-2.5 py-1 rounded border border-slate-300 text-xs" placeholder="Opsi A">
+                                </div>
+                                <div>
+                                    <label class="block font-semibold text-slate-600 mb-0.5">Pilihan B</label>
+                                    <input type="text" class="opt-1 w-full px-2.5 py-1 rounded border border-slate-300 text-xs" placeholder="Opsi B">
+                                </div>
+                                <div>
+                                    <label class="block font-semibold text-slate-600 mb-0.5">Pilihan C</label>
+                                    <input type="text" class="opt-2 w-full px-2.5 py-1 rounded border border-slate-300 text-xs" placeholder="Opsi C">
+                                </div>
+                                <div>
+                                    <label class="block font-semibold text-slate-600 mb-0.5">Pilihan D</label>
+                                    <input type="text" class="opt-3 w-full px-2.5 py-1 rounded border border-slate-300 text-xs" placeholder="Opsi D">
+                                </div>
+                            </div>
+                            <div>
+                                <label class="block font-semibold text-slate-600 mb-0.5">Kunci Jawaban Benar</label>
+                                <select class="q-answer w-full px-3 py-1.5 rounded border border-slate-300 bg-white text-xs">
+                                    <option value="0">Pilihan A</option>
+                                    <option value="1">Pilihan B</option>
+                                    <option value="2">Pilihan C</option>
+                                    <option value="3">Pilihan D</option>
+                                </select>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="flex justify-end space-x-2 px-6 py-3 bg-slate-50 border-t border-slate-200">
+                <button onclick="closeUploadModal()" class="px-4 py-2 rounded-lg text-xs font-medium text-slate-600 hover:bg-slate-200">Batal</button>
+                <button id="submitUploadButton" onclick="submitUploadModule()" class="px-4 py-2 rounded-lg text-xs font-medium bg-indigo-600 hover:bg-indigo-700 text-white shadow-xs">Publikasikan Modul & Soal</button>
+            </div>
+        </div>
+    </div>
+
     <!-- MODAL: MODULE VIEWER & QUIZ -->
     <div id="moduleModal" class="fixed inset-0 bg-slate-900/70 z-50 flex items-center justify-center p-4 hidden">
         <div class="bg-white rounded-2xl shadow-2xl max-w-4xl w-full max-h-[90vh] flex flex-col overflow-hidden">
-            <!-- Modal Header -->
             <div class="px-6 py-4 bg-slate-900 text-white flex items-center justify-between">
                 <div>
                     <span id="modalDeptTag" class="text-[10px] bg-blue-600 text-white px-2 py-0.5 rounded font-bold uppercase tracking-wider">Departemen</span>
@@ -381,9 +855,7 @@
                 </button>
             </div>
 
-            <!-- Modal Body -->
             <div class="flex-1 overflow-y-auto p-6 space-y-6 custom-scrollbar">
-                <!-- Study Timer Widget -->
                 <div class="bg-blue-50 border border-blue-200 rounded-xl p-4 flex items-center justify-between">
                     <div class="flex items-center space-x-3">
                         <div class="w-10 h-10 rounded-full bg-blue-600 text-white flex items-center justify-center font-bold text-sm">
@@ -399,10 +871,8 @@
                     </div>
                 </div>
 
-                <!-- Content Container -->
                 <div id="modalContentContainer" class="bg-slate-100 rounded-xl border border-slate-200 p-4 min-h-[300px] flex flex-col items-center justify-center"></div>
 
-                <!-- Quiz Section -->
                 <div class="bg-white rounded-xl border border-slate-200 p-6 space-y-4">
                     <div class="border-b border-slate-100 pb-3 flex items-center justify-between">
                         <h4 class="font-bold text-slate-900 text-sm"><i class="fa-solid fa-circle-question text-blue-600 mr-2"></i>Kuis Evaluasi Pemahaman Modul</h4>
@@ -414,7 +884,6 @@
                     </button>
                 </div>
 
-                <!-- Training Evaluation Feedback Form -->
                 <div class="bg-slate-50 rounded-xl border border-slate-200 p-6 space-y-4">
                     <h4 class="font-bold text-slate-900 text-sm"><i class="fa-solid fa-star text-amber-500 mr-2"></i>Form Evaluasi & Umpan Balik Training</h4>
                     <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
@@ -451,7 +920,7 @@
         </div>
     </div>
 
-    <!-- MODAL: ADD / EDIT STAFF (SUPER ADMIN) -->
+    <!-- MODAL: ADD / EDIT STAFF -->
     <div id="userModal" class="fixed inset-0 bg-slate-900/70 z-50 flex items-center justify-center p-4 hidden">
         <div class="bg-white rounded-2xl shadow-2xl max-w-md w-full p-6 space-y-4">
             <h3 id="userModalTitle" class="text-base font-bold text-slate-900">Tambah Akun Staff Baru</h3>
@@ -479,13 +948,23 @@
                 </select>
             </div>
             <div>
+                <label class="block text-xs font-semibold text-slate-600 mb-1">Jabatan / Posisi</label>
+                <input type="text" id="adminModalPosition" class="w-full px-3 py-2 rounded-lg border border-slate-300 text-xs" placeholder="Contoh: Staff / Supervisor">
+            </div>
+            <div>
                 <label class="block text-xs font-semibold text-slate-600 mb-1">Role Akses</label>
                 <select id="adminModalRole" class="w-full px-3 py-2 rounded-lg border border-slate-300 text-xs bg-white">
                     <option value="Staff">Staff</option>
+                    <option value="Supervisor">Supervisor</option>
+                    <option value="Head Department">Head Department</option>
                     <option value="Manager">Manager</option>
                     <option value="General Manager">General Manager</option>
                     <option value="Super Admin">Super Admin</option>
                 </select>
+            </div>
+            <div>
+                <label class="block text-xs font-semibold text-slate-600 mb-1">Password Baru <span class="font-normal text-slate-400">(opsional saat edit)</span></label>
+                <input type="password" id="adminModalNewPassword" minlength="8" class="w-full px-3 py-2 rounded-lg border border-slate-300 text-xs" placeholder="Isi untuk membuat password baru">
             </div>
             <div class="flex justify-end space-x-2 pt-2">
                 <button onclick="closeUserModal()" class="px-4 py-2 rounded-lg text-xs font-medium text-slate-600 hover:bg-slate-100">Batal</button>
@@ -500,6 +979,15 @@
             "Front Office", "Housekeeping", "F&B Service", "F&B Product (Kitchen)", 
             "Engineering", "Security & Safety", "Sales & Marketing", "Human Resources", "Accounting & Finance"
         ];
+
+        let rolePermissions = {
+            "Staff": { attendance: true, training: true, rekap: true, monitoringTeam: false, certificate: true, uploadMaterial: false, editMaterial: false, deleteMaterial: false, manageUsers: false },
+            "Supervisor": { attendance: true, training: true, rekap: true, monitoringTeam: true, certificate: true, uploadMaterial: true, editMaterial: true, deleteMaterial: true, manageUsers: false },
+            "Head Department": { attendance: true, training: true, rekap: true, monitoringTeam: true, certificate: true, uploadMaterial: true, editMaterial: true, deleteMaterial: true, manageUsers: true },
+            "Manager": { attendance: true, training: true, rekap: true, monitoringTeam: true, certificate: true, uploadMaterial: true, editMaterial: true, deleteMaterial: true, manageUsers: true },
+            "General Manager": { attendance: true, training: true, rekap: true, monitoringTeam: true, certificate: true, uploadMaterial: true, editMaterial: true, deleteMaterial: true, manageUsers: true },
+            "Super Admin": { attendance: true, training: true, rekap: true, monitoringTeam: true, certificate: true, uploadMaterial: true, editMaterial: true, deleteMaterial: true, manageUsers: true, customConfig: true }
+        };
 
         let modulesData = [
             {
@@ -566,27 +1054,94 @@
         ];
 
         let usersData = [
-            { name: "Budi Santoso", email: "budi.santoso@solialegian.com", dept: "Front Office", role: "Staff" },
-            { name: "Siti Rahma", email: "siti.rahma@solialegian.com", dept: "Housekeeping", role: "Staff" },
-            { name: "Wayan Wirawan", email: "wayan.wirawan@solialegian.com", dept: "Engineering", role: "Manager" },
-            { name: "Super Admin Solia", email: "admin@solialegian.com", dept: "Human Resources", role: "Super Admin" }
+            { name: "Budi Santoso", email: "budi.santoso@solialegian.com", dept: "Front Office", position: "Front Desk Agent", role: "Staff" },
+            { name: "Siti Rahma", email: "siti.rahma@solialegian.com", dept: "Housekeeping", position: "HK Supervisor", role: "Head Department" },
+            { name: "Wayan Wirawan", email: "wayan.wirawan@solialegian.com", dept: "Engineering", position: "Chief Engineering", role: "Manager" },
+            { name: "Putu Ayu", email: "putu.ayu@solialegian.com", dept: "Human Resources", position: "HR Manager", role: "General Manager" },
+            { name: "Super Admin Solia", email: "admin@solialegian.com", dept: "Human Resources", position: "IT System Administrator", role: "Super Admin" }
         ];
 
         let attendanceLogs = [];
-        let trainingLogs = [];
+        let trainingLogs = [
+            { userEmail: "budi.santoso@solialegian.com", userName: "Budi Santoso", title: "Standard Check-in & Guest Welcome SOP", dept: "Front Office", time: "16/08/2026", duration: "30 Menit", durationMinVal: 30, score: 100, status: "Lulus" },
+            { userEmail: "budi.santoso@solialegian.com", userName: "Budi Santoso", title: "Handling Guest Complaints & Recovery", dept: "Front Office", time: "17/08/2026", duration: "25 Menit", durationMinVal: 25, score: 85, status: "Lulus" },
+            { userEmail: "siti.rahma@solialegian.com", userName: "Siti Rahma", title: "Room Cleaning & Sanitization Standard", dept: "Housekeeping", time: "16/08/2026", duration: "45 Menit", durationMinVal: 45, score: 90, status: "Lulus" }
+        ];
+
         let currentUser = null;
-        let generatedOtpCode = "";
         let currentActiveModule = null;
         let studyTimerInterval = null;
         let studySecondsCount = 0;
+        let portalSettings = JSON.parse(localStorage.getItem('soliaLmsPortalSettings') || 'null') || {
+            hotelName: 'Solia Legian Bali',
+            portalSubtitle: 'LMS & Training Academy',
+            hotelDetail: 'Hotel Training & Development Center',
+            hotelContact: 'Hubungi HRD untuk informasi training',
+            monthlyTargetMinutes: 600,
+            hotelLogo: ''
+        };
+        let trainingSettings = JSON.parse(localStorage.getItem('soliaLmsTrainingSettings') || 'null') || {
+            periodStart: '2026-01-01', periodEnd: '2026-12-31', passingScore: 70, notificationsEnabled: true
+        };
+        let adminActivityLogs = JSON.parse(localStorage.getItem('soliaLmsAdminActivityLogs') || '[]');
+        const LMS_API_URL = 'http://localhost:3000/api/lms/state';
 
-        // --- MOBILE MENU TOGGLE ---
+        function syncLmsStateToServer() {
+            if (!currentUser) return;
+            fetch(LMS_API_URL, {
+                method: 'PUT',
+                headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${sessionStorage.getItem('soliaLmsSessionToken') || ''}` },
+                body: JSON.stringify({ usersData, modulesData, attendanceLogs, trainingLogs, rolePermissions, portalSettings, trainingSettings, adminActivityLogs })
+            }).catch(() => { /* Server optional while prototype runs as a local file. */ });
+        }
+
+        async function loadLmsStateFromServer() {
+            try {
+                const response = await fetch(LMS_API_URL, { headers: { 'Authorization': `Bearer ${sessionStorage.getItem('soliaLmsSessionToken') || ''}` } });
+                if (!response.ok) return;
+                const payload = await response.json();
+                const state = payload.state || {};
+                if (!state.usersData || !state.modulesData) return;
+                usersData = state.usersData;
+                modulesData = state.modulesData;
+                attendanceLogs = state.attendanceLogs || attendanceLogs;
+                trainingLogs = state.trainingLogs || trainingLogs;
+                rolePermissions = state.rolePermissions || rolePermissions;
+                portalSettings = state.portalSettings || portalSettings;
+                trainingSettings = state.trainingSettings || trainingSettings;
+                adminActivityLogs = state.adminActivityLogs || adminActivityLogs;
+                renderPortalBranding();
+                renderDashboard();
+                renderModules();
+                renderAdminActivityLog();
+            } catch (error) {
+                // Local mode remains the fallback when the API server is unavailable.
+            }
+        }
+
+        // --- VARIABEL SEMENTARA UNTUK LUPA PASSWORD & OTP ---
+        let tempResetEmail = "";
+        let generatedOtpCode = "";
+        let selectedUploadFile = null;
+        let editingModuleId = null;
+
         function toggleMobileMenu() {
             const mobileMenu = document.getElementById('mobile-menu');
             mobileMenu.classList.toggle('hidden');
         }
 
-        // --- CLOCK WIDGET ---
+        function togglePasswordVisibility(inputId, iconId) {
+            const input = document.getElementById(inputId);
+            const icon = document.getElementById(iconId);
+            if (input.type === "password") {
+                input.type = "text";
+                icon.className = "fa-solid fa-eye-slash text-sm";
+            } else {
+                input.type = "password";
+                icon.className = "fa-solid fa-eye text-sm";
+            }
+        }
+
         setInterval(() => {
             const now = new Date();
             const timeStr = now.toLocaleTimeString('id-ID', { timeZone: 'Asia/Makassar' });
@@ -597,77 +1152,448 @@
             if (dateEl) dateEl.innerText = dateStr;
         }, 1000);
 
-        // --- AUTHENTICATION FLOW ---
-        function requestOTP() {
-            const name = document.getElementById('loginName').value.trim();
-            const email = document.getElementById('loginEmail').value.trim();
-            const dept = document.getElementById('loginDept').value;
+        // --- AUTH TABS SWITCHING ---
+        function switchAuthTab(tab) {
+            const tabLogin = document.getElementById('authTabLogin');
+            const tabRegister = document.getElementById('authTabRegister');
+            const contLogin = document.getElementById('authContainerLogin');
+            const contRegister = document.getElementById('authContainerRegister');
 
-            if (!name || !email) {
-                alert("Harap isi Nama Lengkap dan Email terlebih dahulu!");
+            if (tab === 'login') {
+                tabLogin.className = "flex-1 py-2 rounded-md transition bg-white text-blue-700 shadow-xs";
+                tabRegister.className = "flex-1 py-2 rounded-md transition text-slate-500 hover:text-slate-800";
+                contLogin.classList.remove('hidden');
+                contRegister.classList.add('hidden');
+            } else {
+                tabRegister.className = "flex-1 py-2 rounded-md transition bg-white text-blue-700 shadow-xs";
+                tabLogin.className = "flex-1 py-2 rounded-md transition text-slate-500 hover:text-slate-800";
+                contRegister.classList.remove('hidden');
+                contLogin.classList.add('hidden');
+            }
+        }
+
+        // --- FITUR LUPA PASSWORD & PENGIRIMAN OTP ---
+        function openForgotPasswordModal() {
+            document.getElementById('forgotInputEmail').value = "";
+            document.getElementById('forgotInputOtp').value = "";
+            document.getElementById('forgotNewPassword').value = "";
+            document.getElementById('forgotStep1').classList.remove('hidden');
+            document.getElementById('forgotStep2').classList.add('hidden');
+            document.getElementById('forgotPasswordModal').classList.remove('hidden');
+        }
+
+        function closeForgotPasswordModal() {
+            document.getElementById('forgotPasswordModal').classList.add('hidden');
+        }
+
+        async function sendOtpCode() {
+            const email = document.getElementById('forgotInputEmail').value.trim();
+            if (!email) {
+                alert("Harap masukkan email hotel Anda terlebih dahulu!");
                 return;
             }
 
-            generatedOtpCode = Math.floor(100000 + Math.random() * 900000).toString();
-            document.getElementById('otpDisplayHelper').innerText = `[SIMULASI GMAIL] Kode OTP Anda: ${generatedOtpCode}`;
-            
-            document.getElementById('loginStep1').classList.add('hidden');
-            document.getElementById('loginStep2').classList.remove('hidden');
-        }
-
-        function backToLoginStep1() {
-            document.getElementById('loginStep2').classList.add('hidden');
-            document.getElementById('loginStep1').classList.remove('hidden');
-        }
-
-        function verifyOTP() {
-            const enteredOtp = document.getElementById('loginOtpInput').value.trim();
-            if (enteredOtp !== generatedOtpCode) {
-                alert("Kode OTP salah! Masukkan kode 6 angka yang tertera di kotak simulasi.");
+            tempResetEmail = email;
+            try {
+                const response = await fetch(`${LMS_API_URL.replace('/api/lms/state', '')}/api/auth/request-reset`, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ email }) });
+                const result = await response.json();
+                if (!response.ok) throw new Error(result.message || 'Permintaan OTP gagal.');
+                generatedOtpCode = result.devCode || '';
+                alert(result.delivery === 'email' ? 'Kode OTP sudah dikirim ke email Anda.' : `[Mode Simulasi]\nKode OTP verifikasi: ${generatedOtpCode}`);
+            } catch (error) {
+                alert(`${error.message} Pastikan server LMS sedang berjalan.`);
                 return;
             }
 
-            const name = document.getElementById('loginName').value.trim();
-            const email = document.getElementById('loginEmail').value.trim();
-            const dept = document.getElementById('loginDept').value;
+            document.getElementById('sentEmailDisplay').innerText = email;
+            document.getElementById('forgotStep1').classList.add('hidden');
+            document.getElementById('forgotStep2').classList.remove('hidden');
+        }
 
-            let found = usersData.find(u => u.email.toLowerCase() === email.toLowerCase());
-            if (!found) {
-                found = { name, email, dept, role: "Staff" };
-                usersData.push(found);
+        async function verifyAndResetPassword() {
+            const enteredOtp = document.getElementById('forgotInputOtp').value.trim();
+            const newPassword = document.getElementById('forgotNewPassword').value;
+
+            if (!enteredOtp || !newPassword) {
+                alert("Harap masukkan kode OTP dan password baru Anda!");
+                return;
             }
-            currentUser = found;
 
-            document.getElementById('headerUserName').innerText = currentUser.name;
+            try {
+                const response = await fetch(`${LMS_API_URL.replace('/api/lms/state', '')}/api/auth/reset-password`, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ email: tempResetEmail, code: enteredOtp, newPassword }) });
+                const result = await response.json();
+                if (!response.ok) throw new Error(result.message || 'Reset password gagal.');
+                alert("Password berhasil diubah. Silakan login kembali.");
+                closeForgotPasswordModal();
+                switchAuthTab('login');
+                document.getElementById('loginInputEmail').value = tempResetEmail;
+            } catch (error) { alert(error.message); }
+        }
+
+        // --- LOGIN DIRECT PROCESS ---
+        async function processLoginRequest() {
+            const email = document.getElementById('loginInputEmail').value.trim();
+            const password = document.getElementById('loginInputPassword').value;
+            if (!email || !password) {
+                alert("Harap masukkan email dan password Anda!");
+                return;
+            }
+
+            try {
+                const response = await fetch(`${LMS_API_URL.replace('/api/lms/state', '')}/api/auth/login`, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ email, password }) });
+                const result = await response.json();
+                if (!response.ok) throw new Error(result.message || 'Login gagal.');
+                sessionStorage.setItem('soliaLmsSessionToken', result.token);
+                loginUserSuccess(result.user);
+            } catch (error) {
+                alert(`${error.message} Pastikan server LMS sedang berjalan.`);
+            }
+        }
+
+        // --- REGISTRATION DIRECT PROCESS ---
+        async function processRegisterDirect() {
+            const name = document.getElementById('regName').value.trim();
+            const email = document.getElementById('regEmail').value.trim();
+            const password = document.getElementById('regPassword').value;
+            const dept = document.getElementById('regDept').value;
+            const position = document.getElementById('regPosition').value.trim();
+            const role = "Staff";
+
+            if (!name || !email || !password || !position) {
+                alert("Harap isi Nama Lengkap, Email, Password, dan Jabatan terlebih dahulu!");
+                return;
+            }
+
+            try {
+                const response = await fetch(`${LMS_API_URL.replace('/api/lms/state', '')}/api/auth/register`, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ name, email, password, dept, position }) });
+                const result = await response.json();
+                if (!response.ok) throw new Error(result.message || 'Registrasi gagal.');
+                usersData.push(result.user);
+                alert("Registrasi berhasil! Silakan login dengan password yang baru dibuat.");
+                switchAuthTab('login');
+                document.getElementById('loginInputEmail').value = email;
+            } catch (error) {
+                alert(`${error.message} Pastikan server LMS sedang berjalan.`);
+            }
+        }
+
+        function loginUserSuccess(userObj) {
+            currentUser = userObj;
+            renderPortalBranding();
+
+            document.getElementById('headerUserName').innerText = `${currentUser.name} (${currentUser.position})`;
             document.getElementById('headerUserRole').innerText = `${currentUser.role} - ${currentUser.dept}`;
 
-            if (currentUser.role === "Super Admin" || currentUser.role === "Manager") {
-                document.getElementById('nav-admin').classList.remove('hidden');
-                document.getElementById('mobile-nav-admin').classList.remove('hidden');
-            } else {
-                document.getElementById('nav-admin').classList.add('hidden');
-                document.getElementById('mobile-nav-admin').classList.add('hidden');
-            }
+            applyRolePermissionsUI();
 
             document.getElementById('loginScreen').classList.add('hidden');
             document.getElementById('mainApp').classList.remove('hidden');
 
-            switchTab('attendance');
+            setupManagerFilters();
+            setupTeamMonitoringFilter();
+            switchTab('dashboard');
             renderDeptTabs();
             renderModules();
-            updateRekapStats();
+            renderRekapData();
+            renderDashboard();
+            renderHotelStatistics();
+            loadLmsStateFromServer();
+        }
+
+        function renderPortalBranding() {
+            const textBindings = {
+                headerHotelName: portalSettings.hotelName,
+                headerPortalSubtitle: portalSettings.portalSubtitle,
+                dashboardHotelName: portalSettings.hotelName,
+                dashboardPortalSubtitle: portalSettings.portalSubtitle,
+                dashboardHotelDetail: portalSettings.hotelDetail,
+                dashboardHotelContact: portalSettings.hotelContact
+            };
+            Object.entries(textBindings).forEach(([id, value]) => {
+                const element = document.getElementById(id);
+                if (element) element.innerText = value;
+            });
+
+            const logo = document.getElementById('dashboardHotelLogo');
+            if (logo) logo.innerHTML = portalSettings.hotelLogo ? `<img src="${portalSettings.hotelLogo}" alt="Logo hotel" class="w-full h-full object-contain">` : '<i class="fa-solid fa-hotel"></i>';
+            const headerLogo = document.getElementById('headerHotelLogo');
+            if (headerLogo) headerLogo.innerHTML = portalSettings.hotelLogo ? `<img src="${portalSettings.hotelLogo}" alt="Logo hotel" class="w-full h-full object-contain bg-white">` : '<i class="fa-solid fa-hotel"></i>';
+        }
+
+        function loadPortalSettingsForm() {
+            const values = {
+                settingsHotelName: portalSettings.hotelName,
+                settingsPortalSubtitle: portalSettings.portalSubtitle,
+                settingsHotelDetail: portalSettings.hotelDetail,
+                settingsHotelContact: portalSettings.hotelContact,
+                settingsMonthlyTarget: portalSettings.monthlyTargetMinutes
+            };
+            Object.entries(values).forEach(([id, value]) => {
+                const element = document.getElementById(id);
+                if (element) element.value = value;
+            });
+        }
+
+        function previewHotelLogo(fileInput) {
+            const file = fileInput.files[0];
+            if (!file) return;
+            const reader = new FileReader();
+            reader.onload = event => {
+                portalSettings.hotelLogo = event.target.result;
+                renderPortalBranding();
+            };
+            reader.readAsDataURL(file);
+        }
+
+        function savePortalSettings() {
+            portalSettings.hotelName = document.getElementById('settingsHotelName').value.trim() || 'Solia Legian Bali';
+            portalSettings.portalSubtitle = document.getElementById('settingsPortalSubtitle').value.trim() || 'LMS & Training Academy';
+            portalSettings.hotelDetail = document.getElementById('settingsHotelDetail').value.trim() || 'Hotel Training & Development Center';
+            portalSettings.hotelContact = document.getElementById('settingsHotelContact').value.trim() || 'Hubungi HRD untuk informasi training';
+            portalSettings.monthlyTargetMinutes = Math.max(1, Number(document.getElementById('settingsMonthlyTarget').value) || 600);
+            localStorage.setItem('soliaLmsPortalSettings', JSON.stringify(portalSettings));
+            renderPortalBranding();
+            renderDashboard();
+            syncLmsStateToServer();
+            alert('Profil hotel dan pengaturan LMS berhasil disimpan.');
+        }
+
+        function saveTrainingSettings() {
+            const start = document.getElementById('settingsPeriodStart').value;
+            const end = document.getElementById('settingsPeriodEnd').value;
+            const passingScore = Math.min(100, Math.max(1, Number(document.getElementById('settingsPassingScore').value) || 70));
+            if (start && end && start > end) {
+                alert('Periode mulai tidak boleh setelah periode selesai.');
+                return;
+            }
+            trainingSettings = { periodStart: start, periodEnd: end, passingScore, notificationsEnabled: document.getElementById('settingsNotifications').checked };
+            localStorage.setItem('soliaLmsTrainingSettings', JSON.stringify(trainingSettings));
+            addAdminActivity('Mengubah pengaturan training', `Kelulusan ${passingScore}%`);
+            syncLmsStateToServer();
+            alert('Pengaturan training berhasil disimpan.');
+        }
+
+        function addAdminActivity(action, detail) {
+            if (!currentUser) return;
+            adminActivityLogs.unshift({ time: new Date().toLocaleString('id-ID'), admin: currentUser.name, action, detail });
+            adminActivityLogs = adminActivityLogs.slice(0, 100);
+            localStorage.setItem('soliaLmsAdminActivityLogs', JSON.stringify(adminActivityLogs));
+            renderAdminActivityLog();
+        }
+
+        function renderAdminActivityLog() {
+            const tbody = document.getElementById('adminActivityTableBody');
+            if (!tbody) return;
+            tbody.innerHTML = adminActivityLogs.length ? adminActivityLogs.map(log => `<tr><td class="p-3 text-slate-500">${log.time}</td><td class="p-3 font-semibold">${log.admin}</td><td class="p-3">${log.action}</td><td class="p-3 text-slate-500">${log.detail || '-'}</td></tr>`).join('') : '<tr><td colspan="4" class="p-4 text-center text-slate-400">Belum ada aktivitas Admin.</td></tr>';
+        }
+
+        function loadTrainingSettingsForm() {
+            document.getElementById('settingsPeriodStart').value = trainingSettings.periodStart;
+            document.getElementById('settingsPeriodEnd').value = trainingSettings.periodEnd;
+            document.getElementById('settingsPassingScore').value = trainingSettings.passingScore;
+            document.getElementById('settingsNotifications').checked = trainingSettings.notificationsEnabled;
+        }
+
+        function exportLmsBackup() {
+            const backup = { version: 1, exportedAt: new Date().toISOString(), usersData, modulesData, attendanceLogs, trainingLogs, rolePermissions, portalSettings, trainingSettings, adminActivityLogs };
+            const blob = new Blob([JSON.stringify(backup, null, 2)], { type: 'application/json' });
+            const link = document.createElement('a');
+            link.href = URL.createObjectURL(blob);
+            link.download = `solia-lms-backup-${new Date().toISOString().slice(0, 10)}.json`;
+            link.click();
+            URL.revokeObjectURL(link.href);
+            addAdminActivity('Membuat backup data', link.download);
+        }
+
+        function restoreLmsBackup(fileInput) {
+            const file = fileInput.files[0];
+            if (!file) return;
+            const reader = new FileReader();
+            reader.onload = event => {
+                try {
+                    const backup = JSON.parse(event.target.result);
+                    if (!backup.usersData || !backup.modulesData || !backup.trainingLogs) throw new Error('Struktur backup tidak lengkap');
+                    usersData = backup.usersData;
+                    modulesData = backup.modulesData;
+                    attendanceLogs = backup.attendanceLogs || [];
+                    trainingLogs = backup.trainingLogs;
+                    rolePermissions = backup.rolePermissions || rolePermissions;
+                    portalSettings = backup.portalSettings || portalSettings;
+                    trainingSettings = backup.trainingSettings || trainingSettings;
+                    adminActivityLogs = backup.adminActivityLogs || [];
+                    localStorage.setItem('soliaLmsPortalSettings', JSON.stringify(portalSettings));
+                    localStorage.setItem('soliaLmsTrainingSettings', JSON.stringify(trainingSettings));
+                    localStorage.setItem('soliaLmsAdminActivityLogs', JSON.stringify(adminActivityLogs));
+                    renderPortalBranding(); renderDashboard(); renderModules(); setupManagerFilters(); renderAdminActivityLog();
+                    addAdminActivity('Restore data', file.name);
+                    alert('Backup berhasil dipulihkan.');
+                } catch (error) { alert(`Restore gagal: ${error.message}`); }
+                fileInput.value = '';
+            };
+            reader.readAsText(file);
+        }
+
+        function renderHotelStatistics() {
+            const panel = document.getElementById('hotelOverviewStats');
+            if (!panel || !currentUser) return;
+            const canView = currentUser.dept === 'Human Resources' || currentUser.role === 'Super Admin';
+            panel.classList.toggle('hidden', !canView);
+            if (!canView) return;
+            const scores = trainingLogs.map(log => Number(log.score)).filter(Number.isFinite);
+            document.getElementById('hotelStatUsers').innerText = usersData.length;
+            document.getElementById('hotelStatModules').innerText = modulesData.length;
+            document.getElementById('hotelStatPassed').innerText = trainingLogs.filter(log => log.status === 'Lulus').length;
+            document.getElementById('hotelStatScore').innerText = scores.length ? `${Math.round(scores.reduce((a, b) => a + b, 0) / scores.length)}%` : '-';
+        }
+
+        function applyRolePermissionsUI() {
+            const isSuperAdmin = (currentUser && currentUser.role === 'Super Admin');
+            const canMonitorTeam = hasPermission('monitoringTeam');
+            const navTools = document.getElementById('nav-tools');
+            const mobileNavTools = document.getElementById('mobile-nav-tools');
+            const navManagement = document.getElementById('nav-management');
+            const mobileNavManagement = document.getElementById('mobile-nav-management');
+
+            if (isSuperAdmin) {
+                if (navTools) navTools.classList.remove('hidden');
+                if (mobileNavTools) mobileNavTools.classList.remove('hidden');
+            } else {
+                if (navTools) navTools.classList.add('hidden');
+                if (mobileNavTools) mobileNavTools.classList.add('hidden');
+            }
+
+            if (canMonitorTeam) {
+                if (navManagement) navManagement.classList.remove('hidden');
+                if (mobileNavManagement) mobileNavManagement.classList.remove('hidden');
+            } else {
+                if (navManagement) navManagement.classList.add('hidden');
+                if (mobileNavManagement) mobileNavManagement.classList.add('hidden');
+            }
+
+            let p = rolePermissions[currentUser.role] || rolePermissions["Staff"];
+            const btnUpload = document.getElementById('btnOpenUploadModal');
+            if (p.uploadMaterial) {
+                btnUpload.classList.remove('hidden');
+            } else {
+                btnUpload.classList.add('hidden');
+            }
+        }
+
+        function hasPermission(permissionKey) {
+            return Boolean(currentUser && rolePermissions[currentUser.role]?.[permissionKey]);
         }
 
         function logout() {
+            fetch(`${LMS_API_URL.replace('/api/lms/state', '')}/api/auth/logout`, { method: 'POST', headers: { 'Authorization': `Bearer ${sessionStorage.getItem('soliaLmsSessionToken') || ''}` } }).catch(() => {});
+            sessionStorage.removeItem('soliaLmsSessionToken');
             currentUser = null;
             document.getElementById('mainApp').classList.add('hidden');
             document.getElementById('loginScreen').classList.remove('hidden');
-            document.getElementById('loginOtpInput').value = '';
-            backToLoginStep1();
+            document.getElementById('loginInputEmail').value = '';
+            document.getElementById('loginInputPassword').value = '';
+            switchAuthTab('login');
         }
 
-        // --- NAVIGATION TABS ---
+        function renderDashboard() {
+            if (!currentUser) return;
+
+            const userLogs = trainingLogs.filter(log => log.userEmail === currentUser.email);
+            const totalMins = userLogs.reduce((total, log) => total + (Number(log.durationMinVal) || 0), 0);
+            const hours = Math.floor(totalMins / 60);
+            const mins = totalMins % 60;
+            const completedCount = userLogs.filter(log => log.status === 'Lulus').length;
+            const progress = Math.min(100, Math.round((totalMins / portalSettings.monthlyTargetMinutes) * 100));
+            const activeAttendance = attendanceLogs.find(log => log.userEmail === currentUser.email && log.clockOut === '-');
+
+            document.getElementById('dashboardGreeting').innerText = `Selamat datang, ${currentUser.name}`;
+            document.getElementById('dashboardStudyTime').innerText = `${hours} Jam ${mins} Min`;
+            document.getElementById('dashboardCompleted').innerText = `${completedCount} Modul`;
+            document.getElementById('dashboardProgress').innerText = `${progress}%`;
+            document.getElementById('dashboardProgressBar').style.width = `${progress}%`;
+            document.getElementById('dashboardTargetText').innerText = `Target ${Math.floor(portalSettings.monthlyTargetMinutes / 60)} jam ${portalSettings.monthlyTargetMinutes % 60} menit per bulan`;
+            renderHotelStatistics();
+            document.getElementById('dashboardAttendance').innerText = activeAttendance ? 'Sedang aktif' : 'Belum mulai';
+
+            const activityContainer = document.getElementById('dashboardRecentActivity');
+            const recentLogs = userLogs.slice(0, 4);
+            if (recentLogs.length === 0) {
+                activityContainer.innerHTML = `<p class="py-4 text-xs text-slate-400">Belum ada aktivitas training.</p>`;
+                return;
+            }
+
+            activityContainer.innerHTML = recentLogs.map(log => `
+                <div class="py-3 flex items-center justify-between gap-3">
+                    <div class="min-w-0">
+                        <p class="text-xs font-semibold text-slate-800 truncate">${log.title}</p>
+                        <p class="text-[10px] text-slate-400 mt-0.5">${log.time} &middot; ${log.duration}</p>
+                    </div>
+                    <span class="shrink-0 px-2 py-0.5 rounded text-[10px] font-semibold ${log.status === 'Lulus' ? 'bg-emerald-50 text-emerald-700' : 'bg-rose-50 text-rose-700'}">${log.status}</span>
+                </div>
+            `).join('');
+        }
+
+        function setupTeamMonitoringFilter() {
+            const filter = document.getElementById('teamDeptFilter');
+            if (!filter || !currentUser) return;
+
+            const isScopedRole = ["Supervisor", "Head Department"].includes(currentUser.role);
+            const availableDepartments = isScopedRole ? [currentUser.dept] : departments;
+            filter.innerHTML = availableDepartments.map(dept => `<option value="${dept}">${dept}</option>`).join('');
+            filter.value = currentUser.dept;
+            renderTeamMonitoring();
+        }
+
+        function renderTeamMonitoring() {
+            if (!currentUser) return;
+
+            const filter = document.getElementById('teamDeptFilter');
+            const selectedDept = filter ? filter.value : currentUser.dept;
+            const isScopedRole = ["Supervisor", "Head Department"].includes(currentUser.role);
+            const targetDept = isScopedRole ? currentUser.dept : selectedDept;
+            const teamUsers = usersData.filter(user => user.dept === targetDept);
+            const rows = teamUsers.map(user => {
+                const userLogs = trainingLogs.filter(log => log.userEmail === user.email);
+                const totalMins = userLogs.reduce((total, log) => total + (Number(log.durationMinVal) || 0), 0);
+                const passedModules = userLogs.filter(log => log.status === 'Lulus').length;
+                const scoredLogs = userLogs.filter(log => Number.isFinite(Number(log.score)));
+                const averageScore = scoredLogs.length ? Math.round(scoredLogs.reduce((total, log) => total + Number(log.score), 0) / scoredLogs.length) : 0;
+                return { user, totalMins, passedModules, averageScore, reachedTarget: totalMins >= 600 };
+            });
+
+            const onTrack = rows.filter(row => row.reachedTarget).length;
+            const scoredRows = rows.filter(row => row.averageScore > 0);
+            const averageScore = scoredRows.length ? Math.round(scoredRows.reduce((total, row) => total + row.averageScore, 0) / scoredRows.length) : 0;
+            document.getElementById('teamTotalStaff').innerText = rows.length;
+            document.getElementById('teamOnTrack').innerText = onTrack;
+            document.getElementById('teamNeedsAttention').innerText = rows.length - onTrack;
+            document.getElementById('teamAverageScore').innerText = averageScore ? `${averageScore}%` : '-';
+
+            const tbody = document.getElementById('teamMonitoringTableBody');
+            if (!rows.length) {
+                tbody.innerHTML = `<tr><td colspan="6" class="p-4 text-center text-slate-400">Belum ada staff pada departemen ini.</td></tr>`;
+                return;
+            }
+
+            tbody.innerHTML = rows.map(row => `
+                <tr class="hover:bg-slate-50">
+                    <td class="p-3 font-semibold text-slate-800">${row.user.name}<div class="text-[10px] text-slate-400 font-normal">${row.user.position || '-'}</div></td>
+                    <td class="p-3 text-slate-600">${row.user.dept}</td>
+                    <td class="p-3">${Math.floor(row.totalMins / 60)} Jam ${row.totalMins % 60} Min</td>
+                    <td class="p-3">${row.passedModules} Modul</td>
+                    <td class="p-3 font-semibold">${row.averageScore ? `${row.averageScore}%` : '-'}</td>
+                    <td class="p-3"><span class="px-2 py-0.5 rounded text-[10px] font-semibold ${row.reachedTarget ? 'bg-emerald-50 text-emerald-700' : 'bg-amber-50 text-amber-700'}">${row.reachedTarget ? 'Mencapai target' : 'Perlu perhatian'}</span></td>
+                </tr>
+            `).join('');
+        }
+
         function switchTab(tabId) {
+            if (tabId === 'tools') {
+                if (!currentUser || currentUser.role !== 'Super Admin') {
+                    alert("Akses ditolak! Menu Tools hanya khusus untuk Super Admin.");
+                    return;
+                }
+            }
+
             document.querySelectorAll('.tab-content').forEach(el => el.classList.add('hidden'));
             document.querySelectorAll('.nav-btn').forEach(btn => {
                 btn.classList.remove('text-blue-700', 'bg-blue-50');
@@ -681,25 +1607,127 @@
                 activeBtn.classList.add('text-blue-700', 'bg-blue-50');
             }
 
-            if (tabId === 'admin') {
+            if (tabId === 'dashboard') {
+                renderDashboard();
+            } else if (tabId === 'rekap') {
+                renderRekapData();
+            } else if (tabId === 'certificate') {
+                renderCertificateView();
+            } else if (tabId === 'tools') {
+                renderToolsVisibility();
+                loadPortalSettingsForm();
+                loadTrainingSettingsForm();
+                populateToolsDepartmentFilter();
+                renderToolsPermissionTable();
                 renderAdminUserTable();
-                renderAdminModuleSelect();
-                renderAdminQuizEditor();
+                renderAdminActivityLog();
             }
         }
 
-        // --- ATTENDANCE LOGIC ---
+        function renderToolsVisibility() {
+            const isSuperAdmin = (currentUser && currentUser.role === 'Super Admin');
+            const sec1 = document.getElementById('superAdminSection1');
+            const sec2 = document.getElementById('superAdminSection2');
+            const btnAddUser = document.getElementById('btnAddUserMain');
+
+            if (isSuperAdmin) {
+                if (sec1) sec1.classList.remove('hidden');
+                if (sec2) sec2.classList.remove('hidden');
+                if (btnAddUser) btnAddUser.classList.remove('hidden');
+            } else {
+                if (sec1) sec1.classList.add('hidden');
+                if (sec2) sec2.classList.add('hidden');
+                if (btnAddUser) btnAddUser.classList.add('hidden');
+            }
+        }
+
+        function populateToolsDepartmentFilter() {
+            const filter = document.getElementById('toolsDeptFilter');
+            if (!filter) return;
+            const currentValue = filter.value || 'All';
+            filter.innerHTML = `<option value="All">Semua Departemen</option>` + departments.map(dept => `<option value="${dept}">${dept}</option>`).join('');
+            filter.value = departments.includes(currentValue) ? currentValue : 'All';
+        }
+
+        function setupManagerFilters() {
+            const canMonitorRekap = ["Supervisor", "Head Department", "Manager"].includes(currentUser.role) || hasAllDepartmentRekapAccess();
+            const hasAllDepartmentAccess = hasAllDepartmentRekapAccess();
+            const managerFilterBar = document.getElementById('managerFilterBar');
+            const certFilterContainer = document.getElementById('certFilterContainer');
+
+            if (canMonitorRekap) {
+                managerFilterBar.classList.remove('hidden');
+                certFilterContainer.classList.remove('hidden');
+
+                const deptSelect = document.getElementById('adminFilterDept');
+                if (hasAllDepartmentAccess) {
+                    deptSelect.innerHTML = `<option value="All">Semua Departemen</option>` + departments.map(d => `<option value="${d}">${d}</option>`).join('');
+                    deptSelect.disabled = false;
+                    populateStaffFilter('All');
+                } else {
+                    deptSelect.innerHTML = `<option value="${currentUser.dept}">${currentUser.dept}</option>`;
+                    deptSelect.value = currentUser.dept;
+                    deptSelect.disabled = true;
+                    populateStaffFilter(currentUser.dept);
+                }
+                populateCertStaffSelect();
+            } else {
+                managerFilterBar.classList.add('hidden');
+                certFilterContainer.classList.add('hidden');
+            }
+        }
+
+        function hasAllDepartmentRekapAccess() {
+            return currentUser && (currentUser.role === 'Super Admin' || currentUser.dept === 'Human Resources');
+        }
+
+        function populateStaffFilter(selectedDept) {
+            const staffSelect = document.getElementById('adminFilterStaff');
+            let filteredUsers = usersData;
+            if (selectedDept !== 'All') {
+                filteredUsers = usersData.filter(u => u.dept === selectedDept);
+            }
+            staffSelect.innerHTML = `<option value="All">Semua Staff</option>` + filteredUsers.map(u => `<option value="${u.email}">${u.name} (${u.position})</option>`).join('');
+        }
+
+        function onAdminDeptFilterChange() {
+            if (!hasAllDepartmentRekapAccess()) {
+                document.getElementById('adminFilterDept').value = currentUser.dept;
+                populateStaffFilter(currentUser.dept);
+                renderRekapData();
+                return;
+            }
+            const dept = document.getElementById('adminFilterDept').value;
+            populateStaffFilter(dept);
+            renderRekapData();
+        }
+
+        function populateCertStaffSelect() {
+            const sel = document.getElementById('certStaffSelect');
+            sel.innerHTML = usersData.map(u => `<option value="${u.email}">${u.name} - ${u.dept}</option>`).join('');
+            sel.value = currentUser.email;
+        }
+
+        // --- ATTENDANCE ---
         function handleClockIn() {
             const now = new Date();
             const timeStr = now.toLocaleTimeString('id-ID', { timeZone: 'Asia/Makassar' });
             const dateStr = now.toLocaleDateString('id-ID', { timeZone: 'Asia/Makassar' });
 
+            const activeSession = attendanceLogs.find(log => log.userEmail === currentUser.email && log.clockOut === "-");
+            if (activeSession) {
+                alert("Anda masih memiliki sesi absensi yang aktif.");
+                return;
+            }
+
             attendanceLogs.unshift({
+                userEmail: currentUser.email,
                 date: dateStr,
                 clockIn: timeStr,
                 clockOut: "-",
                 durationMinutes: 0,
-                status: "Aktif Sesi"
+                status: "Aktif Sesi",
+                startedAt: now.getTime()
             });
 
             document.getElementById('btnClockIn').classList.add('hidden');
@@ -709,16 +1737,18 @@
             badge.innerHTML = `<i class="fa-solid fa-circle text-[8px] mr-2 text-emerald-500 animate-pulse"></i> Sedang Bertugas (Clock In)`;
 
             renderAttendanceTable();
+            renderDashboard();
         }
 
         function handleClockOut() {
             const now = new Date();
             const timeStr = now.toLocaleTimeString('id-ID', { timeZone: 'Asia/Makassar' });
 
-            if (attendanceLogs.length > 0 && attendanceLogs[0].clockOut === "-") {
-                attendanceLogs[0].clockOut = timeStr;
-                attendanceLogs[0].durationMinutes = 120;
-                attendanceLogs[0].status = "Selesai";
+            const activeSession = attendanceLogs.find(log => log.userEmail === currentUser.email && log.clockOut === "-");
+            if (activeSession) {
+                activeSession.clockOut = timeStr;
+                activeSession.durationMinutes = Math.max(1, Math.round((now.getTime() - activeSession.startedAt) / 60000));
+                activeSession.status = "Selesai";
             }
 
             document.getElementById('btnClockOut').classList.add('hidden');
@@ -728,17 +1758,19 @@
             badge.innerHTML = `<i class="fa-solid fa-circle text-[8px] mr-2 text-slate-400"></i> Sesi Telah Berakhir`;
 
             renderAttendanceTable();
-            updateRekapStats();
+            renderRekapData();
+            renderDashboard();
         }
 
         function renderAttendanceTable() {
             const tbody = document.getElementById('attendanceTableBody');
-            if (attendanceLogs.length === 0) {
+            const userAttendanceLogs = attendanceLogs.filter(log => log.userEmail === currentUser.email);
+            if (userAttendanceLogs.length === 0) {
                 tbody.innerHTML = `<tr><td colspan="5" class="p-4 text-center text-slate-400">Belum ada riwayat absensi tercatat.</td></tr>`;
                 return;
             }
 
-            tbody.innerHTML = attendanceLogs.map(log => `
+            tbody.innerHTML = userAttendanceLogs.map(log => `
                 <tr class="hover:bg-slate-50">
                     <td class="p-3 font-medium text-slate-800">${log.date}</td>
                     <td class="p-3 text-emerald-600 font-semibold">${log.clockIn}</td>
@@ -749,7 +1781,363 @@
             `).join('');
         }
 
-        // --- TRAINING MATERIAL & MODAL VIEWER ---
+        // --- UPLOAD MATERI + BANK SOAL DINAMIS ---
+        function handleUploadFileSelection(fileInput) {
+            const file = fileInput.files[0];
+            const fileName = document.getElementById('uploadFileName');
+            selectedUploadFile = file || null;
+            if (!file) {
+                fileName.innerText = '';
+                return;
+            }
+
+            const allowedExtensions = ['pdf', 'ppt', 'pptx', 'mp4', 'webm', 'mov'];
+            const extension = file.name.split('.').pop().toLowerCase();
+            if (!allowedExtensions.includes(extension)) {
+                alert('Format file tidak didukung. Gunakan PDF, PPT, PPTX, MP4, WEBM, atau MOV.');
+                fileInput.value = '';
+                selectedUploadFile = null;
+                fileName.innerText = '';
+                return;
+            }
+
+            if (['mp4', 'webm', 'mov'].includes(extension)) {
+                document.getElementById('uploadType').value = 'Video';
+            } else {
+                document.getElementById('uploadType').value = extension === 'pdf' ? 'PDF' : 'SOP';
+            }
+            fileName.innerText = `File dipilih: ${file.name}`;
+        }
+
+        function openUploadModal() {
+            editingModuleId = null;
+            document.querySelector('#uploadModal h3').innerHTML = '<i class="fa-solid fa-cloud-arrow-up mr-2"></i>Upload Modul Training Baru & Bank Soal Wajib';
+            document.getElementById('submitUploadButton').innerText = 'Publikasikan Modul & Soal';
+            document.getElementById('uploadTitle').value = "";
+            document.getElementById('uploadDuration').value = "30 Menit";
+            document.getElementById('uploadDesc').value = "";
+            document.getElementById('uploadUrl').value = "";
+            document.getElementById('uploadFile').value = "";
+            document.getElementById('uploadFileName').innerText = "";
+            selectedUploadFile = null;
+            document.getElementById('uploadAccessScope').value = 'department';
+            renderUploadAccessOptions();
+            
+            document.getElementById('uploadQuizContainer').innerHTML = `
+                <div class="bg-slate-50 p-3.5 rounded-xl border border-slate-200 space-y-2 quiz-question-block">
+                    <div class="flex items-center justify-between">
+                        <span class="font-bold text-slate-700 text-xs q-number">Pertanyaan 1</span>
+                    </div>
+                    <div>
+                        <label class="block font-semibold text-slate-600 mb-0.5">Teks Pertanyaan</label>
+                        <input type="text" class="q-text w-full px-3 py-1.5 rounded-lg border border-slate-300 text-xs" placeholder="Contoh: Apa langkah pertama prosedur...">
+                    </div>
+                    <div class="grid grid-cols-2 gap-2">
+                        <div><label class="block font-semibold text-slate-600 mb-0.5">Pilihan A</label><input type="text" class="opt-0 w-full px-2.5 py-1 rounded border border-slate-300 text-xs" placeholder="Opsi A"></div>
+                        <div><label class="block font-semibold text-slate-600 mb-0.5">Pilihan B</label><input type="text" class="opt-1 w-full px-2.5 py-1 rounded border border-slate-300 text-xs" placeholder="Opsi B"></div>
+                        <div><label class="block font-semibold text-slate-600 mb-0.5">Pilihan C</label><input type="text" class="opt-2 w-full px-2.5 py-1 rounded border border-slate-300 text-xs" placeholder="Opsi C"></div>
+                        <div><label class="block font-semibold text-slate-600 mb-0.5">Pilihan D</label><input type="text" class="opt-3 w-full px-2.5 py-1 rounded border border-slate-300 text-xs" placeholder="Opsi D"></div>
+                    </div>
+                    <div>
+                        <label class="block font-semibold text-slate-600 mb-0.5">Kunci Jawaban Benar</label>
+                        <select class="q-answer w-full px-3 py-1.5 rounded border border-slate-300 bg-white text-xs">
+                            <option value="0">Pilihan A</option>
+                            <option value="1">Pilihan B</option>
+                            <option value="2">Pilihan C</option>
+                            <option value="3">Pilihan D</option>
+                        </select>
+                    </div>
+                </div>
+            `;
+
+            document.getElementById('uploadModal').classList.remove('hidden');
+        }
+
+        function canManageModule(module) {
+            if (!currentUser || !module) return false;
+            if (currentUser.role === 'Super Admin') return true;
+            const permissions = rolePermissions[currentUser.role] || {};
+            return Boolean(module.createdBy && module.createdBy === currentUser.email && permissions.uploadMaterial && permissions.editMaterial && permissions.deleteMaterial);
+        }
+
+        function populateQuizEditor(questions) {
+            const container = document.getElementById('uploadQuizContainer');
+            container.innerHTML = '';
+            questions.forEach((question, index) => {
+                const div = document.createElement('div');
+                div.className = 'bg-slate-50 p-3.5 rounded-xl border border-slate-200 space-y-2 quiz-question-block relative';
+                div.innerHTML = `
+                    <div class="flex items-center justify-between"><span class="font-bold text-slate-700 text-xs q-number">Pertanyaan ${index + 1}</span><button onclick="this.closest('.quiz-question-block').remove(); updateQuizNumbers();" class="text-rose-600 hover:text-rose-800 text-xs font-semibold"><i class="fa-solid fa-trash mr-1"></i>Hapus</button></div>
+                    <div><label class="block font-semibold text-slate-600 mb-0.5">Teks Pertanyaan</label><input type="text" class="q-text w-full px-3 py-1.5 rounded-lg border border-slate-300 text-xs" value="${question.q.replace(/"/g, '&quot;')}"></div>
+                    <div class="grid grid-cols-2 gap-2">
+                        ${question.options.map((option, optionIndex) => `<div><label class="block font-semibold text-slate-600 mb-0.5">Pilihan ${String.fromCharCode(65 + optionIndex)}</label><input type="text" class="opt-${optionIndex} w-full px-2.5 py-1 rounded border border-slate-300 text-xs" value="${option.replace(/"/g, '&quot;')}"></div>`).join('')}
+                    </div>
+                    <div><label class="block font-semibold text-slate-600 mb-0.5">Kunci Jawaban Benar</label><select class="q-answer w-full px-3 py-1.5 rounded border border-slate-300 bg-white text-xs"><option value="0">Pilihan A</option><option value="1">Pilihan B</option><option value="2">Pilihan C</option><option value="3">Pilihan D</option></select></div>
+                `;
+                div.querySelector('.q-answer').value = question.answer;
+                container.appendChild(div);
+            });
+        }
+
+        function editModule(moduleId) {
+            const module = modulesData.find(item => item.id === moduleId);
+            if (!canManageModule(module)) {
+                alert('Anda tidak memiliki izin untuk mengedit modul ini.');
+                return;
+            }
+
+            editingModuleId = moduleId;
+            document.querySelector('#uploadModal h3').innerHTML = '<i class="fa-solid fa-pen-to-square mr-2"></i>Edit Modul Training';
+            document.getElementById('submitUploadButton').innerText = 'Simpan Perubahan Modul';
+            document.getElementById('uploadTitle').value = module.title;
+            document.getElementById('uploadDept').value = module.dept;
+            document.getElementById('uploadType').value = module.type;
+            document.getElementById('uploadDuration').value = module.duration;
+            document.getElementById('uploadDesc').value = module.desc;
+            document.getElementById('uploadUrl').value = module.fileName ? '' : module.contentUrl;
+            document.getElementById('uploadFile').value = '';
+            document.getElementById('uploadFileName').innerText = module.fileName ? `File saat ini: ${module.fileName}` : '';
+            selectedUploadFile = null;
+            document.getElementById('uploadAccessScope').value = module.accessScope || 'department';
+            renderUploadAccessOptions();
+
+            if (module.accessScope === 'department') {
+                document.querySelectorAll('.upload-department-option').forEach(input => input.checked = (module.allowedDepartments || [module.dept]).includes(input.value));
+            } else if (module.accessScope === 'position') {
+                document.getElementById('uploadAccessPositionDept').value = module.accessDepartment || departments[0];
+                renderUploadAccessOptions();
+                document.querySelectorAll('.upload-user-option').forEach(input => input.checked = (module.allowedUsers || []).includes(input.value));
+            }
+            populateQuizEditor(module.questions);
+            document.getElementById('uploadModal').classList.remove('hidden');
+        }
+
+        function deleteModule(moduleId) {
+            const module = modulesData.find(item => item.id === moduleId);
+            if (!canManageModule(module)) {
+                alert('Anda tidak memiliki izin untuk menghapus modul ini.');
+                return;
+            }
+            if (!confirm(`Hapus modul "${module.title}"? Data kuis dan aksesnya juga akan dihapus.`)) return;
+            if (module.contentUrl.startsWith('blob:')) URL.revokeObjectURL(module.contentUrl);
+            modulesData = modulesData.filter(item => item.id !== moduleId);
+            renderModules();
+            addAdminActivity('Menghapus modul', module.title);
+            syncLmsStateToServer();
+            alert('Modul berhasil dihapus.');
+        }
+
+        function renderUploadAccessOptions() {
+            const scope = document.getElementById('uploadAccessScope').value;
+            const container = document.getElementById('uploadAccessOptions');
+            if (scope === 'all') {
+                container.innerHTML = `<p class="text-xs font-semibold text-emerald-700"><i class="fa-solid fa-globe mr-1"></i>Materi dapat diakses semua departemen dan posisi.</p>`;
+                return;
+            }
+
+            if (scope === 'position') {
+                const selectedDept = document.getElementById('uploadAccessPositionDept')?.value || departments[0];
+                const departmentUsers = usersData.filter(user => user.dept === selectedDept);
+                const staffOptions = departmentUsers.map(user => `
+                    <label class="flex items-start gap-2 text-xs text-slate-700">
+                        <input type="checkbox" class="upload-user-option mt-0.5 rounded border-slate-300 text-indigo-600" value="${user.email}">
+                        <span><strong>${user.name}</strong><span class="block text-[10px] text-slate-500">${user.position || 'Staff'}</span></span>
+                    </label>
+                `).join('');
+                container.innerHTML = `
+                    <div>
+                        <label for="uploadAccessPositionDept" class="block font-semibold text-slate-600 mb-1">Pilih departemen terlebih dahulu</label>
+                        <select id="uploadAccessPositionDept" onchange="renderUploadAccessOptions()" class="w-full px-3 py-2 rounded-lg border border-slate-300 bg-white text-xs">
+                            ${departments.map(dept => `<option value="${dept}" ${dept === selectedDept ? 'selected' : ''}>${dept}</option>`).join('')}
+                        </select>
+                    </div>
+                    <div class="grid grid-cols-1 sm:grid-cols-2 gap-2 max-h-36 overflow-y-auto pr-1">
+                        ${staffOptions || '<p class="text-xs text-rose-600">Belum ada staff pada departemen ini.</p>'}
+                    </div>
+                `;
+                return;
+            }
+
+            container.innerHTML = `<div class="grid grid-cols-1 sm:grid-cols-2 gap-2">${departments.map(dept => `
+                <label class="flex items-center gap-2 text-xs text-slate-700">
+                    <input type="checkbox" class="upload-department-option rounded border-slate-300 text-indigo-600" value="${dept}" ${dept === document.getElementById('uploadDept').value ? 'checked' : ''}>
+                    <span>${dept}</span>
+                </label>
+            `).join('')}</div>`;
+        }
+
+        function closeUploadModal() {
+            document.getElementById('uploadModal').classList.add('hidden');
+        }
+
+        function addQuizQuestionField() {
+            const container = document.getElementById('uploadQuizContainer');
+            const count = container.querySelectorAll('.quiz-question-block').length + 1;
+
+            const div = document.createElement('div');
+            div.className = "bg-slate-50 p-3.5 rounded-xl border border-slate-200 space-y-2 quiz-question-block relative";
+            div.innerHTML = `
+                <div class="flex items-center justify-between">
+                    <span class="font-bold text-slate-700 text-xs q-number">Pertanyaan ${count}</span>
+                    <button onclick="this.closest('.quiz-question-block').remove(); updateQuizNumbers();" class="text-rose-600 hover:text-rose-800 text-xs font-semibold"><i class="fa-solid fa-trash mr-1"></i>Hapus</button>
+                </div>
+                <div>
+                    <label class="block font-semibold text-slate-600 mb-0.5">Teks Pertanyaan</label>
+                    <input type="text" class="q-text w-full px-3 py-1.5 rounded-lg border border-slate-300 text-xs" placeholder="Tulis pertanyaan kuis...">
+                </div>
+                <div class="grid grid-cols-2 gap-2">
+                    <div><label class="block font-semibold text-slate-600 mb-0.5">Pilihan A</label><input type="text" class="opt-0 w-full px-2.5 py-1 rounded border border-slate-300 text-xs" placeholder="Opsi A"></div>
+                    <div><label class="block font-semibold text-slate-600 mb-0.5">Pilihan B</label><input type="text" class="opt-1 w-full px-2.5 py-1 rounded border border-slate-300 text-xs" placeholder="Opsi B"></div>
+                    <div><label class="block font-semibold text-slate-600 mb-0.5">Pilihan C</label><input type="text" class="opt-2 w-full px-2.5 py-1 rounded border border-slate-300 text-xs" placeholder="Opsi C"></div>
+                    <div><label class="block font-semibold text-slate-600 mb-0.5">Pilihan D</label><input type="text" class="opt-3 w-full px-2.5 py-1 rounded border border-slate-300 text-xs" placeholder="Opsi D"></div>
+                </div>
+                <div>
+                    <label class="block font-semibold text-slate-600 mb-0.5">Kunci Jawaban Benar</label>
+                    <select class="q-answer w-full px-3 py-1.5 rounded border border-slate-300 bg-white text-xs">
+                        <option value="0">Pilihan A</option>
+                        <option value="1">Pilihan B</option>
+                        <option value="2">Pilihan C</option>
+                        <option value="3">Pilihan D</option>
+                    </select>
+                </div>
+            `;
+            container.appendChild(div);
+        }
+
+        function updateQuizNumbers() {
+            const blocks = document.querySelectorAll('.quiz-question-block');
+            blocks.forEach((b, idx) => {
+                b.querySelector('.q-number').innerText = `Pertanyaan ${idx + 1}`;
+            });
+        }
+
+        async function submitUploadModule() {
+            const title = document.getElementById('uploadTitle').value.trim();
+            const dept = document.getElementById('uploadDept').value;
+            const type = document.getElementById('uploadType').value;
+            const accessScope = document.getElementById('uploadAccessScope').value;
+            const allowedDepartments = [...document.querySelectorAll('.upload-department-option:checked')].map(input => input.value);
+            const allowedUsers = [...document.querySelectorAll('.upload-user-option:checked')].map(input => input.value);
+            const duration = document.getElementById('uploadDuration').value.trim();
+            const desc = document.getElementById('uploadDesc').value.trim();
+            const contentUrl = document.getElementById('uploadUrl').value.trim();
+
+            if (!title || (!contentUrl && !selectedUploadFile)) {
+                alert("Judul Modul dan salah satu sumber materi (URL atau file lokal) wajib diisi!");
+                return;
+            }
+            if (accessScope === 'department' && allowedDepartments.length === 0) {
+                alert('Pilih minimal satu departemen yang dapat mengakses materi ini.');
+                return;
+            }
+            if (accessScope === 'position' && allowedUsers.length === 0) {
+                alert('Pilih minimal satu nama staff yang dapat mengakses materi ini.');
+                return;
+            }
+
+            let finalContentUrl = contentUrl;
+            let contentType = type === 'Video' ? 'video/mp4' : 'application/pdf';
+            let fileName = '';
+            if (selectedUploadFile) {
+                try {
+                    const dataUrl = await new Promise((resolve, reject) => {
+                        const reader = new FileReader();
+                        reader.onload = () => resolve(reader.result);
+                        reader.onerror = reject;
+                        reader.readAsDataURL(selectedUploadFile);
+                    });
+                    const response = await fetch(`${LMS_API_URL.replace('/api/lms/state', '')}/api/lms/files`, {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${sessionStorage.getItem('soliaLmsSessionToken') || ''}` },
+                        body: JSON.stringify({ fileName: selectedUploadFile.name, dataUrl })
+                    });
+                    const result = await response.json();
+                    if (!response.ok) throw new Error(result.message || 'Upload file gagal.');
+                    finalContentUrl = `${LMS_API_URL.replace('/api/lms/state', '')}${result.url}`;
+                    contentType = selectedUploadFile.type || 'application/octet-stream';
+                    fileName = result.fileName;
+                } catch (error) {
+                    alert(`${error.message} Pastikan server LMS sedang berjalan.`);
+                    return;
+                }
+            }
+
+            const qBlocks = document.querySelectorAll('.quiz-question-block');
+            let questionsArr = [];
+            let isValidQuiz = true;
+
+            qBlocks.forEach((block) => {
+                const qText = block.querySelector('.q-text').value.trim();
+                const optA = block.querySelector('.opt-0').value.trim();
+                const optB = block.querySelector('.opt-1').value.trim();
+                const optC = block.querySelector('.opt-2').value.trim();
+                const optD = block.querySelector('.opt-3').value.trim();
+                const ans = parseInt(block.querySelector('.q-answer').value);
+
+                if (!qText || !optA || !optB || !optC || !optD) {
+                    isValidQuiz = false;
+                }
+
+                questionsArr.push({
+                    q: qText,
+                    options: [optA, optB, optC, optD],
+                    answer: ans
+                });
+            });
+
+            if (!isValidQuiz || questionsArr.length === 0) {
+                alert("Gagal mempublikasikan! Anda wajib mengisi lengkap teks pertanyaan dan seluruh pilihan opsi A, B, C, dan D untuk setiap soal kuis.");
+                return;
+            }
+
+            const newModule = {
+                id: "mod-" + Date.now(),
+                dept: dept,
+                title: title,
+                type: type,
+                duration: duration || "30 Menit",
+                desc: desc || "Materi pelatihan resmi Solia Legian Bali.",
+                contentUrl: finalContentUrl,
+                contentType: contentType,
+                fileName: fileName,
+                accessScope: accessScope,
+                allowedDepartments: accessScope === 'department' ? allowedDepartments : [],
+                allowedUsers: accessScope === 'position' ? allowedUsers : [],
+                accessDepartment: accessScope === 'position' ? document.getElementById('uploadAccessPositionDept')?.value || '' : '',
+                createdBy: currentUser.email,
+                createdByName: currentUser.name,
+                questions: questionsArr
+            };
+
+            if (editingModuleId) {
+                const existingModule = modulesData.find(module => module.id === editingModuleId);
+                if (!existingModule || !canManageModule(existingModule)) {
+                    alert('Anda tidak memiliki izin untuk mengubah modul ini.');
+                    return;
+                }
+                if (!selectedUploadFile) {
+                    newModule.contentUrl = existingModule.contentUrl;
+                    newModule.contentType = existingModule.contentType;
+                    newModule.fileName = existingModule.fileName;
+                }
+                newModule.id = existingModule.id;
+                newModule.createdBy = existingModule.createdBy;
+                newModule.createdByName = existingModule.createdByName;
+                modulesData = modulesData.map(module => module.id === editingModuleId ? newModule : module);
+                addAdminActivity('Mengedit modul', newModule.title);
+                alert("Modul training berhasil diperbarui.");
+            } else {
+                modulesData.unshift(newModule);
+                addAdminActivity('Menambah modul', newModule.title);
+                alert("Modul training beserta bank soal kuis wajib berhasil dipublikasikan!");
+            }
+            closeUploadModal();
+            editingModuleId = null;
+            renderModules();
+            syncLmsStateToServer();
+        }
+
+        // --- TRAINING MATERIALS ---
         let selectedDeptFilter = "All";
 
         function renderDeptTabs() {
@@ -779,9 +2167,10 @@
             const typeFilter = document.getElementById('filterType').value;
 
             let filtered = modulesData.filter(m => {
+                let hasAccess = moduleIsAccessibleToCurrentUser(m);
                 let matchDept = (selectedDeptFilter === 'All' || m.dept === selectedDeptFilter);
                 let matchType = (typeFilter === 'all' || m.type === typeFilter);
-                return matchDept && matchType;
+                return hasAccess && matchDept && matchType;
             });
 
             if (filtered.length === 0) {
@@ -801,28 +2190,58 @@
                     </div>
                     <div class="mt-6 pt-4 border-t border-slate-100 flex items-center justify-between">
                         <span class="text-xs font-semibold text-slate-400"><i class="fa-solid fa-file-shield mr-1"></i>${m.type}</span>
-                        <button onclick="openModuleModal('${m.id}')" class="bg-blue-600 hover:bg-blue-700 text-white px-3.5 py-1.5 rounded-lg text-xs font-medium transition shadow-xs">
-                            Pelajari <i class="fa-solid fa-arrow-right ml-1"></i>
-                        </button>
+                        <div class="flex items-center gap-2">
+                            ${canManageModule(m) ? `<button onclick="editModule('${m.id}')" title="Edit modul" class="text-blue-600 hover:text-blue-800 p-1.5"><i class="fa-solid fa-pen-to-square"></i></button><button onclick="deleteModule('${m.id}')" title="Hapus modul" class="text-rose-600 hover:text-rose-800 p-1.5"><i class="fa-solid fa-trash"></i></button>` : ''}
+                            <button onclick="openModuleModal('${m.id}')" class="bg-blue-600 hover:bg-blue-700 text-white px-3.5 py-1.5 rounded-lg text-xs font-medium transition shadow-xs">
+                                Pelajari <i class="fa-solid fa-arrow-right ml-1"></i>
+                            </button>
+                        </div>
                     </div>
                 </div>
             `).join('');
         }
 
+        function moduleIsAccessibleToCurrentUser(module) {
+            if (!currentUser) return false;
+            if (currentUser.role === 'Super Admin' || module.createdBy === currentUser.email) return true;
+            if (!module.accessScope) return true;
+            if (module.accessScope === 'all') return true;
+            if (module.accessScope === 'department') return (module.allowedDepartments || []).includes(currentUser.dept);
+            if (module.accessScope === 'position') return (module.allowedUsers || []).includes(currentUser.email) || (module.allowedPositions || []).includes(currentUser.position);
+            return false;
+        }
+
         function openModuleModal(modId) {
             currentActiveModule = modulesData.find(m => m.id === modId);
-            if (!currentActiveModule) return;
+            if (!currentActiveModule || !moduleIsAccessibleToCurrentUser(currentActiveModule)) {
+                alert('Anda tidak memiliki akses ke materi ini.');
+                return;
+            }
 
             document.getElementById('modalDeptTag').innerText = currentActiveModule.dept;
             document.getElementById('modalModuleTitle').innerText = currentActiveModule.title;
 
             const contentBox = document.getElementById('modalContentContainer');
-            if (currentActiveModule.type === 'Video') {
+            const contentType = currentActiveModule.contentType || '';
+            const contentName = currentActiveModule.fileName || currentActiveModule.contentUrl;
+            const isVideo = currentActiveModule.type === 'Video' || contentType.startsWith('video/');
+            const isPresentation = /\.(pptx?|ppsx?)($|\?)/i.test(contentName) || contentType.includes('presentation');
+            if (isVideo) {
                 contentBox.innerHTML = `
                     <video controls class="w-full h-64 rounded-lg shadow-sm bg-black">
-                        <source src="${currentActiveModule.contentUrl}" type="video/mp4">
+                        <source src="${currentActiveModule.contentUrl}" type="${contentType || 'video/mp4'}">
                         Browser Anda tidak mendukung tag video.
                     </video>
+                `;
+            } else if (isPresentation) {
+                contentBox.innerHTML = `
+                    <div class="w-full text-center space-y-4 py-10">
+                        <i class="fa-solid fa-file-powerpoint text-rose-600 text-5xl"></i>
+                        <p class="text-sm font-semibold text-slate-700">File PowerPoint siap dibuka atau diunduh.</p>
+                        <a href="${currentActiveModule.contentUrl}" download="${currentActiveModule.fileName || 'materi-training.pptx'}" target="_blank" rel="noopener" class="inline-flex items-center bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg text-xs font-semibold transition">
+                            <i class="fa-solid fa-download mr-2"></i>Buka / Unduh PowerPoint
+                        </a>
+                    </div>
                 `;
             } else {
                 contentBox.innerHTML = `
@@ -877,21 +2296,25 @@
             });
 
             let score = Math.round((correctCount / currentActiveModule.questions.length) * 100);
-            let status = score >= 70 ? "Lulus" : "Gagal";
+            let status = score >= trainingSettings.passingScore ? "Lulus" : "Gagal";
 
             alert(`Kuis Selesai! Skor Anda: ${score} (${status})`);
 
             trainingLogs.unshift({
+                userEmail: currentUser.email,
+                userName: currentUser.name,
                 title: currentActiveModule.title,
                 dept: currentActiveModule.dept,
                 time: new Date().toLocaleDateString('id-ID'),
-                duration: `${Math.ceil(studySecondsCount / 60)} Menit`,
-                durationMinVal: Math.ceil(studySecondsCount / 60),
+                duration: `${Math.max(1, Math.ceil(studySecondsCount / 60))} Menit`,
+                durationMinVal: Math.max(1, Math.ceil(studySecondsCount / 60)),
                 score: score,
                 status: status
             });
 
-            updateRekapStats();
+            renderRekapData();
+            renderDashboard();
+            syncLmsStateToServer();
             closeModuleModal();
         }
 
@@ -899,14 +2322,30 @@
             alert("Terima kasih! Umpan balik evaluasi training Anda berhasil dikirim ke sistem HRD Solia Legian Bali.");
         }
 
-        // --- REKAP & STATS ---
-        function updateRekapStats() {
-            let totalMins = trainingLogs.reduce((acc, cur) => acc + cur.durationMinVal, 0);
+        // --- REKAP & EVALUASI WITH RBAC ---
+        function renderRekapData() {
+            const canMonitorRekap = ["Supervisor", "Head Department", "Manager"].includes(currentUser.role) || hasAllDepartmentRekapAccess();
+            
+            let targetLogs = [];
+            if (canMonitorRekap) {
+                const filterDept = hasAllDepartmentRekapAccess() ? document.getElementById('adminFilterDept').value : currentUser.dept;
+                const filterStaff = document.getElementById('adminFilterStaff').value;
+
+                targetLogs = trainingLogs.filter(l => {
+                    let matchDept = hasAllDepartmentRekapAccess() ? (filterDept === 'All' || l.dept === filterDept) : l.dept === currentUser.dept;
+                    let matchStaff = (filterStaff === 'All' || l.userEmail === filterStaff);
+                    return matchDept && matchStaff;
+                });
+            } else {
+                targetLogs = trainingLogs.filter(l => l.userEmail === currentUser.email);
+            }
+
+            let totalMins = targetLogs.reduce((acc, cur) => acc + cur.durationMinVal, 0);
             let hours = Math.floor(totalMins / 60);
             let mins = totalMins % 60;
             document.getElementById('statTotalHours').innerText = `${hours} Jam ${mins} Min`;
 
-            let completedCount = trainingLogs.filter(l => l.status === 'Lulus').length;
+            let completedCount = targetLogs.filter(l => l.status === 'Lulus').length;
             document.getElementById('statCompletedModules').innerText = `${completedCount} Modul`;
 
             let targetMinutes = 600;
@@ -914,13 +2353,14 @@
             document.getElementById('statPercentage').innerText = `${percentage}%`;
 
             const tbody = document.getElementById('rekapTableBody');
-            if (trainingLogs.length === 0) {
-                tbody.innerHTML = `<tr><td colspan="6" class="p-4 text-center text-slate-400">Belum ada aktivitas training tercatat.</td></tr>`;
+            if (targetLogs.length === 0) {
+                tbody.innerHTML = `<tr><td colspan="7" class="p-4 text-center text-slate-400">Belum ada aktivitas training tercatat.</td></tr>`;
                 return;
             }
 
-            tbody.innerHTML = trainingLogs.map(log => `
+            tbody.innerHTML = targetLogs.map(log => `
                 <tr class="hover:bg-slate-50">
+                    <td class="p-3 font-bold text-slate-900">${log.userName}</td>
                     <td class="p-3 font-medium text-slate-800">${log.title}</td>
                     <td class="p-3"><span class="px-2 py-0.5 rounded text-[10px] font-semibold bg-blue-50 text-blue-700">${log.dept}</span></td>
                     <td class="p-3 text-slate-500">${log.time}</td>
@@ -931,14 +2371,79 @@
             `).join('');
         }
 
-        // --- SUPER ADMIN PANEL ---
+        // --- CERTIFICATE VIEW WITH RBAC ---
+        function renderCertificateView() {
+            const isManagerOrAbove = ["Head Department", "Manager", "General Manager", "Super Admin"].includes(currentUser.role);
+            let targetUser = currentUser;
+
+            if (isManagerOrAbove) {
+                const selectedEmail = document.getElementById('certStaffSelect').value;
+                let foundU = usersData.find(u => u.email === selectedEmail);
+                if (foundU) targetUser = foundU;
+            }
+
+            document.getElementById('certStaffName').innerText = targetUser.name;
+            document.getElementById('certStaffDetail').innerText = `${targetUser.position || 'Staff'} - ${targetUser.dept} Department`;
+        }
+
+        // --- TOOLS & ACCESS CONTROL PANEL ---
+        function renderToolsPermissionTable() {
+            const tbody = document.getElementById('toolsPermissionTableBody');
+            if (!tbody) return;
+
+            let html = "";
+            for (let role in rolePermissions) {
+                let p = rolePermissions[role];
+                let isSuperAdmin = (currentUser.role === 'Super Admin');
+                html += `
+                    <tr class="hover:bg-slate-50">
+                        <td class="p-3 font-bold text-slate-800">${role}</td>
+                        <td class="p-3 text-center"><input type="checkbox" ${p.attendance ? 'checked' : ''} ${!isSuperAdmin ? 'disabled' : ''} onchange="updatePermission('${role}', 'attendance', this.checked)"></td>
+                        <td class="p-3 text-center"><input type="checkbox" ${p.training ? 'checked' : ''} ${!isSuperAdmin ? 'disabled' : ''} onchange="updatePermission('${role}', 'training', this.checked)"></td>
+                        <td class="p-3 text-center"><input type="checkbox" ${p.rekap ? 'checked' : ''} ${!isSuperAdmin ? 'disabled' : ''} onchange="updatePermission('${role}', 'rekap', this.checked)"></td>
+                        <td class="p-3 text-center"><input type="checkbox" ${p.monitoringTeam ? 'checked' : ''} ${!isSuperAdmin ? 'disabled' : ''} onchange="updatePermission('${role}', 'monitoringTeam', this.checked)"></td>
+                        <td class="p-3 text-center"><input type="checkbox" ${p.certificate ? 'checked' : ''} ${!isSuperAdmin ? 'disabled' : ''} onchange="updatePermission('${role}', 'certificate', this.checked)"></td>
+                        <td class="p-3 text-center"><input type="checkbox" ${p.uploadMaterial ? 'checked' : ''} ${!isSuperAdmin ? 'disabled' : ''} onchange="updatePermission('${role}', 'uploadMaterial', this.checked)"></td>
+                        <td class="p-3 text-center"><input type="checkbox" ${p.editMaterial && p.deleteMaterial ? 'checked' : ''} ${!isSuperAdmin ? 'disabled' : ''} onchange="updateMaterialManagementPermission('${role}', this.checked)"></td>
+                        <td class="p-3 text-center"><input type="checkbox" ${p.manageUsers ? 'checked' : ''} ${!isSuperAdmin ? 'disabled' : ''} onchange="updatePermission('${role}', 'manageUsers', this.checked)"></td>
+                    </tr>
+                `;
+            }
+            tbody.innerHTML = html;
+        }
+
+        function updatePermission(role, permKey, value) {
+            if (currentUser.role !== 'Super Admin') {
+                alert("Hanya Super Admin yang dapat mengubah hak akses role!");
+                renderToolsPermissionTable();
+                return;
+            }
+            rolePermissions[role][permKey] = value;
+            alert(`Hak akses ${permKey} untuk role ${role} berhasil diperbarui.`);
+        }
+
+        function updateMaterialManagementPermission(role, value) {
+            if (currentUser.role !== 'Super Admin') {
+                alert('Hanya Super Admin yang dapat mengubah hak akses role!');
+                renderToolsPermissionTable();
+                return;
+            }
+            rolePermissions[role].editMaterial = value;
+            rolePermissions[role].deleteMaterial = value;
+            alert(`Hak edit dan hapus materi untuk role ${role} berhasil diperbarui.`);
+        }
+
         function renderAdminUserTable() {
             const tbody = document.getElementById('adminUserTableBody');
-            tbody.innerHTML = usersData.map(u => `
+            if (!tbody) return;
+            const deptFilter = document.getElementById('toolsDeptFilter')?.value || 'All';
+            const filteredUsers = deptFilter === 'All' ? usersData : usersData.filter(u => u.dept === deptFilter);
+            tbody.innerHTML = filteredUsers.map(u => `
                 <tr class="hover:bg-slate-50">
                     <td class="p-3 font-medium text-slate-800">${u.name}</td>
                     <td class="p-3 text-slate-500">${u.email}</td>
                     <td class="p-3"><span class="px-2 py-0.5 rounded text-[10px] font-semibold bg-blue-50 text-blue-700">${u.dept}</span></td>
+                    <td class="p-3 text-slate-600">${u.position || '-'}</td>
                     <td class="p-3"><span class="px-2 py-0.5 rounded text-[10px] font-semibold bg-slate-100 text-slate-700">${u.role}</span></td>
                     <td class="p-3 text-right space-x-2">
                         <button onclick="editUser('${u.email}')" class="text-blue-600 hover:text-blue-800 font-medium"><i class="fa-solid fa-pen-to-square"></i></button>
@@ -954,7 +2459,9 @@
             document.getElementById('adminModalName').value = "";
             document.getElementById('adminModalEmail').value = "";
             document.getElementById('adminModalDept').value = "Front Office";
+            document.getElementById('adminModalPosition').value = "";
             document.getElementById('adminModalRole').value = "Staff";
+            document.getElementById('adminModalNewPassword').value = "";
             document.getElementById('userModal').classList.remove('hidden');
         }
 
@@ -966,7 +2473,9 @@
             document.getElementById('adminModalName').value = u.name;
             document.getElementById('adminModalEmail').value = u.email;
             document.getElementById('adminModalDept').value = u.dept;
+            document.getElementById('adminModalPosition').value = u.position || "";
             document.getElementById('adminModalRole').value = u.role;
+            document.getElementById('adminModalNewPassword').value = "";
             document.getElementById('userModal').classList.remove('hidden');
         }
 
@@ -974,66 +2483,41 @@
             document.getElementById('userModal').classList.add('hidden');
         }
 
-        function saveUserModal() {
+        async function saveUserModal() {
             const origEmail = document.getElementById('editUserEmailOriginal').value;
             const name = document.getElementById('adminModalName').value.trim();
             const email = document.getElementById('adminModalEmail').value.trim();
             const dept = document.getElementById('adminModalDept').value;
+            const position = document.getElementById('adminModalPosition').value.trim();
             const role = document.getElementById('adminModalRole').value;
+            const newPassword = document.getElementById('adminModalNewPassword').value;
 
             if (!name || !email) {
                 alert("Nama dan Email wajib diisi!");
                 return;
             }
 
-            if (origEmail) {
-                let u = usersData.find(x => x.email === origEmail);
-                if (u) {
-                    u.name = name;
-                    u.email = email;
-                    u.dept = dept;
-                    u.role = role;
+            try {
+                const token = sessionStorage.getItem('soliaLmsSessionToken') || '';
+                const endpoint = origEmail ? `${LMS_API_URL.replace('/api/lms/state', '')}/api/users/${encodeURIComponent(origEmail)}` : `${LMS_API_URL.replace('/api/lms/state', '')}/api/users`;
+                const response = await fetch(endpoint, { method: origEmail ? 'PATCH' : 'POST', headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${token}` }, body: JSON.stringify({ name, email, dept, position, role, newPassword: newPassword || undefined }) });
+                const result = await response.json();
+                if (!response.ok) throw new Error(result.message || 'Penyimpanan user gagal.');
+                if (origEmail) usersData = usersData.map(user => user.email === origEmail ? result.user : user);
+                else {
+                    usersData.push(result.user);
+                    alert(`User berhasil dibuat. Password sementara: ${result.temporaryPassword}`);
                 }
-            } else {
-                usersData.push({ name, email, dept, role });
+            } catch (error) {
+                alert(`${error.message} Pastikan server LMS sedang berjalan.`);
+                return;
             }
 
             closeUserModal();
             renderAdminUserTable();
-        }
-
-        function deleteUser(email) {
-            if (confirm(`Hapus akun ${email} dari sistem?`)) {
-                usersData = usersData.filter(x => x.email !== email);
-                renderAdminUserTable();
-            }
-        }
-
-        function renderAdminModuleSelect() {
-            const sel = document.getElementById('adminModuleSelect');
-            sel.innerHTML = modulesData.map(m => `<option value="${m.id}">${m.dept} - ${m.title}</option>`).join('');
-        }
-
-        function renderAdminQuizEditor() {
-            const modId = document.getElementById('adminModuleSelect').value;
-            const mod = modulesData.find(m => m.id === modId);
-            const container = document.getElementById('adminQuizEditorContainer');
-            if (!mod) return;
-
-            container.innerHTML = `
-                <div class="space-y-3">
-                    <div class="text-xs font-bold text-slate-700">Daftar Pertanyaan Kuis Modul Ini:</div>
-                    ${mod.questions.map((q, idx) => `
-                        <div class="bg-white p-3 rounded-lg border border-slate-200 text-xs space-y-1">
-                            <div class="font-bold text-slate-800">Soal ${idx + 1}: ${q.q}</div>
-                            <div class="text-slate-500">Kunci Jawaban: Pilihan ke-${q.answer + 1} (${q.options[q.answer]})</div>
-                        </div>
-                    `).join('')}
-                    <div class="text-[11px] text-blue-700 bg-blue-50 p-2 rounded border border-blue-200">
-                        <i class="fa-solid fa-circle-info mr-1"></i> Admin dapat memperbarui modul atau menambah bank soal kuis melalui pembaruan sistem database HRD.
-                    </div>
-                </div>
-            `;
+            setupManagerFilters();
+            addAdminActivity(origEmail ? 'Mengedit akun user' : 'Menambah akun user', email);
+            syncLmsStateToServer();
         }
     </script>
 </body>
